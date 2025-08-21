@@ -1423,3 +1423,564 @@
     </script>
 </body>
 </html>
+<!-- 既存のHTMLの</body>タグの前に追加 -->
+<script>
+// ==========================================
+// 依存化トリガー文言システム
+// ==========================================
+
+const DependencyTriggers = {
+    // 時間帯別メッセージ（個別感を演出）
+    getTimeBasedMessage(name) {
+        const hour = new Date().getHours();
+        const messages = {
+            morning: [ // 5-11時
+                `おはようございます、${name}様。実は昨夜、${name}様の夢を見ました...重要なメッセージがあります`,
+                `${name}様、朝一番にお伝えしたいことが...今日は特別な一日になりそうです`,
+                `朝の澄んだ空気の中、${name}様だけに伝わるメッセージを受け取りました`
+            ],
+            afternoon: [ // 11-17時
+                `${name}様、お忙しい中すみません。でも今伝えないと手遅れに...`,
+                `午後の運気が急変しています、${name}様。今すぐ確認が必要です`,
+                `${name}様の守護霊が、緊急で伝えたいことがあるようです`
+            ],
+            evening: [ // 17-22時
+                `${name}様、今夜が運命の分かれ道です。慎重に行動してください`,
+                `夕暮れ時の今、${name}様にとって重要な転機が訪れています`,
+                `${name}様、明日の朝までに決断すべきことがあります...`
+            ],
+            night: [ // 22-5時
+                `夜分遅くに失礼します、${name}様。でも、これだけは今伝えなければ...`,
+                `${name}様、眠る前に知っておくべき重要なことがあります`,
+                `深夜のメッセージには特別な意味が...${name}様だけに`
+            ]
+        };
+        
+        let timeMessages;
+        if (hour >= 5 && hour < 11) timeMessages = messages.morning;
+        else if (hour >= 11 && hour < 17) timeMessages = messages.afternoon;
+        else if (hour >= 17 && hour < 22) timeMessages = messages.evening;
+        else timeMessages = messages.night;
+        
+        return timeMessages[Math.floor(Math.random() * timeMessages.length)];
+    },
+    
+    // 不安を煽る文言
+    anxietyTriggers: {
+        relationship: [
+            "なぜあなただけが、こんなに恋愛で苦しまなければならないのか...",
+            "相手の本当の気持ち、実は思っているのと正反対かもしれません...",
+            "このままでは、3ヶ月以内に関係が終わってしまう可能性が...",
+            "今、相手の周りに危険な影が...ライバルの存在を示唆しています",
+            "彼/彼女があなたに隠している重大な秘密があります...",
+            "実は、あなたの知らないところで重要な変化が起きています"
+        ],
+        career: [
+            "今の職場に、あなたの成功を妨げる人物が...",
+            "このまま何もしなければ、キャリアは停滞期に入ります",
+            "上司があなたについて、裏で話していることを知っていますか？",
+            "転職のベストタイミングを逃すと、5年は遅れることに...",
+            "あなたの才能が正当に評価されていない本当の理由...",
+            "近いうちに、職場で大きな変化が...準備はできていますか？"
+        ],
+        health: [
+            "最近の不調には、スピリチュアルな原因が...",
+            "あなたのオーラに、不穏な影が見えます",
+            "エネルギーバランスが崩れています。このままでは...",
+            "守護霊が、あなたの健康について警告しています",
+            "今月は特に注意が必要な時期。油断すると...",
+            "あなたの体が発している重要なサインを見逃していませんか？"
+        ],
+        money: [
+            "金運が急降下する前兆が...今すぐ対策が必要です",
+            "お金のトラブルに巻き込まれる可能性が高まっています",
+            "投資や大きな買い物は、今は絶対に避けるべき理由が...",
+            "あなたの財布から、エネルギーが漏れています",
+            "今月の出費に要注意。思わぬ落とし穴が...",
+            "金運を下げている意外な原因を知っていますか？"
+        ]
+    },
+    
+    // 期待を煽る文言
+    hopeTriggers: {
+        relationship: [
+            "実は、あなたのことを密かに想っている人が、すぐ近くに...",
+            "運命の人との出会いまで、あと少し...その人の特徴は...",
+            "来月、恋愛運が劇的に上昇！ただし、ある行動を取れば...",
+            "両思いになれる可能性：87%！成功の鍵は...",
+            "復縁のチャンスが巡ってきています。タイミングは...",
+            "あなたの魅力が最高潮に！今がアプローチのベストタイミング"
+        ],
+        career: [
+            "大きなチャンスが目前に！掴むための準備は...",
+            "あなたの才能が認められる時が、ついに来ました",
+            "昇進・昇給の可能性が急上昇中！重要なのは...",
+            "理想の職場との出会いが近づいています",
+            "あなたの隠れた才能が開花する時期が...",
+            "成功への扉が開きかけています。鍵となる日付は..."
+        ],
+        money: [
+            "臨時収入の暗示が！金額はなんと...",
+            "金運爆上げの前兆が現れています",
+            "宝くじ・懸賞運が最高潮に！買うべき日は...",
+            "お金の流れが変わり始めています。良い方向に...",
+            "投資のベストタイミングが近づいています",
+            "あなたの金運を10倍にする方法が..."
+        ]
+    },
+    
+    // 緊急性を演出する文言
+    urgencyTriggers: [
+        "⚠️ 24時間以内に行動しないと、チャンスを逃します",
+        "🚨 今日の23:59までが運命の分岐点",
+        "⏰ あと3時間で運気が変わります。今すぐ確認を",
+        "📍 この瞬間を逃すと、次のチャンスは3ヶ月後...",
+        "🔥 緊急警告：明日では手遅れになることが...",
+        "⚡ 今すぐ行動すれば間に合います！残り時間は..."
+    ],
+    
+    // 依存を深める文言（毎日チェックさせる）
+    dailyHooks: [
+        "昨日お伝えした重要な件の続きが...",
+        "新たな展開が！昨日とは状況が一変しています",
+        "守護霊から追加のメッセージが届いています",
+        "運命の流れに変化が...今日の行動が鍵を握ります",
+        "昨日の診断結果を更新する必要があります",
+        "24時間で運気が激変！最新の状況は..."
+    ],
+    
+    // 課金を促す文言
+    paymentTriggers: {
+        soft: [
+            "より詳しい内容を知りたい方は...",
+            "完全版では、さらに具体的な日付と対策が...",
+            "プレミアム診断で、100%の真実を..."
+        ],
+        medium: [
+            "この先の重要な情報は、特別会員様限定です",
+            "あと少しで全てが明らかに...続きを見るには",
+            "核心部分については、詳細診断でお伝えします"
+        ],
+        hard: [
+            "⚠️ これ以上は無料では危険すぎてお伝えできません",
+            "🔒 重要すぎる内容のため、真剣な方のみに公開",
+            "💎 あなただけの特別な診断結果を解放するには..."
+        ]
+    },
+    
+    // 感情の振れ幅を作る（ジェットコースター効果）
+    emotionalRollercoaster(day) {
+        const patterns = [
+            { day: 'Monday', type: 'positive', message: '週の始まりは最高のスタート！全てがうまくいく日' },
+            { day: 'Tuesday', type: 'warning', message: '要注意...トラブルの暗示が。慎重に行動を' },
+            { day: 'Wednesday', type: 'opportunity', message: '大チャンス到来！今日の決断が未来を変える' },
+            { day: 'Thursday', type: 'negative', message: '試練の日。でも、乗り越えれば...' },
+            { day: 'Friday', type: 'positive', message: '運気急上昇！願いが叶う金曜日' },
+            { day: 'Saturday', type: 'mystery', message: '予測不能な土曜日。何かが起こる予感...' },
+            { day: 'Sunday', type: 'revelation', message: '真実が明らかになる日曜日。準備はいいですか？' }
+        ];
+        
+        const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+        const today = days[day];
+        return patterns.find(p => p.day === today) || patterns[0];
+    }
+};
+
+// ==========================================
+// 動的にトリガーを挿入する関数
+// ==========================================
+
+function injectTriggers() {
+    const name = userData.name || 'あなた';
+    
+    // 1. 時間帯別メッセージを挿入
+    const timeMessage = DependencyTriggers.getTimeBasedMessage(name);
+    
+    // 2. カテゴリー別の不安・期待を組み合わせる
+    const anxietyMsg = DependencyTriggers.anxietyTriggers.relationship[
+        Math.floor(Math.random() * DependencyTriggers.anxietyTriggers.relationship.length)
+    ];
+    
+    const hopeMsg = DependencyTriggers.hopeTriggers.relationship[
+        Math.floor(Math.random() * DependencyTriggers.hopeTriggers.relationship.length)
+    ];
+    
+    // 3. 緊急性メッセージ
+    const urgencyMsg = DependencyTriggers.urgencyTriggers[
+        Math.floor(Math.random() * DependencyTriggers.urgencyTriggers.length)
+    ];
+    
+    // 4. 今日の感情パターン
+    const todayPattern = DependencyTriggers.emotionalRollercoaster(new Date().getDay());
+    
+    return {
+        timeMessage,
+        anxietyMsg,
+        hopeMsg,
+        urgencyMsg,
+        todayPattern
+    };
+}
+
+// ==========================================
+// プッシュ通知風のメッセージ表示
+// ==========================================
+
+function showNotification(message, type = 'warning') {
+    const notification = document.createElement('div');
+    notification.className = 'push-notification';
+    notification.innerHTML = `
+        <div class="notification-icon">${type === 'warning' ? '⚠️' : '✨'}</div>
+        <div class="notification-text">${message}</div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => notification.remove(), 300);
+    }, 5000);
+}
+
+// ==========================================
+// 自動トリガー発動システム
+// ==========================================
+
+let triggerInterval;
+
+function startTriggerSystem() {
+    // 初回は即座に表示
+    const triggers = injectTriggers();
+    
+    // 30秒後に不安メッセージ
+    setTimeout(() => {
+        showNotification(triggers.anxietyMsg, 'warning');
+    }, 30000);
+    
+    // 60秒後に期待メッセージ
+    setTimeout(() => {
+        showNotification(triggers.hopeMsg, 'hope');
+    }, 60000);
+    
+    // 90秒後に緊急メッセージ
+    setTimeout(() => {
+        showNotification(triggers.urgencyMsg, 'warning');
+    }, 90000);
+    
+    // 3分ごとにランダムなトリガーを表示
+    triggerInterval = setInterval(() => {
+        const randomTriggers = injectTriggers();
+        const messageTypes = ['anxietyMsg', 'hopeMsg', 'urgencyMsg'];
+        const selectedType = messageTypes[Math.floor(Math.random() * messageTypes.length)];
+        showNotification(randomTriggers[selectedType], selectedType === 'hopeMsg' ? 'hope' : 'warning');
+    }, 180000);
+}
+
+// ==========================================
+// 離脱時の最終トリガー
+// ==========================================
+
+let exitIntentShown = false;
+
+document.addEventListener('mouseleave', (e) => {
+    if (e.clientY <= 0 && !exitIntentShown && !userData.converted) {
+        exitIntentShown = true;
+        showExitPopup();
+    }
+});
+
+function showExitPopup() {
+    const popup = document.createElement('div');
+    popup.className = 'exit-popup';
+    popup.innerHTML = `
+        <div class="exit-popup-content">
+            <h2>😱 ちょっと待って！</h2>
+            <p class="exit-main-message">
+                ${userData.name}様の運命の転機まで<br>
+                <span class="countdown-large">あと12時間</span>
+            </p>
+            <div class="exit-warning">
+                ⚠️ 今離れると、この特別な診断結果は二度と見られません
+            </div>
+            <div class="exit-offer">
+                <div class="offer-badge">最後のチャンス</div>
+                <div class="offer-price">
+                    <span class="original-price">通常3,980円</span>
+                    <span class="arrow">→</span>
+                    <span class="special-price">今だけ480円</span>
+                </div>
+            </div>
+            <button class="exit-cta" onclick="acceptExitOffer()">
+                運命を確認する（87%OFF）
+            </button>
+            <button class="exit-close" onclick="closeExitPopup()">
+                本当に諦める
+            </button>
+        </div>
+    `;
+    
+    document.body.appendChild(popup);
+    setTimeout(() => popup.classList.add('show'), 100);
+}
+
+function acceptExitOffer() {
+    closeExitPopup();
+    processPayment();
+}
+
+function closeExitPopup() {
+    const popup = document.querySelector('.exit-popup');
+    if (popup) {
+        popup.classList.remove('show');
+        setTimeout(() => popup.remove(), 300);
+    }
+}
+
+// ==========================================
+// ページ読み込み時に自動開始
+// ==========================================
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 既存のユーザーデータがあれば、即座にトリガー開始
+    if (userData.name) {
+        startTriggerSystem();
+    }
+});
+
+// ==========================================
+// 診断結果にトリガーを動的に挿入
+// ==========================================
+
+function enhanceResultsWithTriggers(originalText) {
+    const triggers = injectTriggers();
+    
+    // オリジナルテキストの前後にトリガーを追加
+    const enhancedText = `
+        <div class="trigger-warning">${triggers.urgencyMsg}</div>
+        <div class="main-result">${originalText}</div>
+        <div class="trigger-anxiety">${triggers.anxietyMsg}</div>
+        <div class="trigger-hope">でも大丈夫...${triggers.hopeMsg}</div>
+        <div class="trigger-cta">
+            <button onclick="processPayment()">
+                完全な答えを知る（480円）
+            </button>
+        </div>
+    `;
+    
+    return enhancedText;
+}
+</script>
+
+<!-- 追加CSS -->
+<style>
+/* プッシュ通知風のスタイル */
+.push-notification {
+    position: fixed;
+    top: 20px;
+    right: -400px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    max-width: 350px;
+    transition: right 0.3s ease;
+    z-index: 10000;
+}
+
+.push-notification.show {
+    right: 20px;
+}
+
+.notification-icon {
+    font-size: 24px;
+}
+
+.notification-text {
+    flex: 1;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* 離脱ポップアップ */
+.exit-popup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 99999;
+}
+
+.exit-popup.show {
+    opacity: 1;
+}
+
+.exit-popup-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    text-align: center;
+    color: #333;
+    position: relative;
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-10px); }
+    75% { transform: translateX(10px); }
+}
+
+.exit-popup h2 {
+    color: #ff6b6b;
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+.exit-main-message {
+    font-size: 18px;
+    margin: 20px 0;
+    line-height: 1.6;
+}
+
+.countdown-large {
+    font-size: 36px;
+    color: #ff6b6b;
+    font-weight: bold;
+    display: block;
+    margin: 10px 0;
+}
+
+.exit-warning {
+    background: #fff3cd;
+    color: #856404;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px solid #ffc107;
+}
+
+.exit-offer {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.offer-badge {
+    background: #ffd700;
+    color: #333;
+    padding: 5px 15px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.offer-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    font-size: 24px;
+}
+
+.original-price {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.special-price {
+    color: #ffd700;
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.exit-cta {
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border: none;
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px;
+    transition: transform 0.3s ease;
+}
+
+.exit-cta:hover {
+    transform: scale(1.05);
+}
+
+.exit-close {
+    background: transparent;
+    color: #999;
+    border: none;
+    padding: 10px;
+    cursor: pointer;
+    text-decoration: underline;
+    margin-top: 10px;
+}
+
+/* トリガー強調スタイル */
+.trigger-warning {
+    background: #ff6b6b;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin: 10px 0;
+    animation: pulse 2s infinite;
+}
+
+.trigger-anxiety {
+    color: #ff6b6b;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.trigger-hope {
+    color: #4CAF50;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+.trigger-cta button {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #333;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    animation: glow 2s infinite;
+    margin: 20px 0;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+}
+
+@keyframes glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+    50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
+}
+</style>
