@@ -143,6 +143,41 @@
             font-size: 16px;
             display: block;
         }
+
+        .special-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 10000;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+        }
+
+        .exit-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 10000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .exit-modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+        }
     </style>
 </head>
 <body>
@@ -160,7 +195,7 @@
             </div>
         </div>
         
-        <div class="fortune-grid">
+        <div class="fortune-grid" id="fortune-selection">
             <div class="fortune-card" onclick="startFortune('astrology')">
                 <h3>⭐ 西洋占星術</h3>
                 <p>12星座が導く運命</p>
@@ -196,24 +231,60 @@
         </div>
         
         <div id="result-section">
-            <h2 id="result-name">結果</h2>
-            <div style="background:rgba(255,255,255,0.1);padding:30px;border-radius:15px;margin:20px 0;">
-                <p id="result-text"></p>
-            </div>
-            <div style="filter:blur(5px);background:rgba(255,255,255,0.05);padding:30px;border-radius:15px;position:relative;">
-                <p>さらに詳しい内容が...</p>
-                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);padding:20px;border-radius:10px;">
-                    <p style="color:gold;font-size:1.2em;">💫 完全版を解放 💫</p>
-                    <a href="https://buy.stripe.com/test_https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200" class="cta-button">
-                        今だけ480円
-                    </a>
-                </div>
-            </div>
+            <!-- 結果はJavaScriptで動的に挿入 -->
+        </div>
+    </div>
+
+    <!-- 特別なお知らせポップアップ -->
+    <div id="special-popup" class="special-popup" style="display:none;">
+        <h2 style="margin-bottom:15px;">🌟 特別なお知らせ 🌟</h2>
+        <p style="margin-bottom:20px;">あなたは選ばれし<span id="visitor-number">14</span>人目の訪問者です！</p>
+        <p style="color:#FFD700;font-size:1.2em;margin-bottom:20px;">今だけ初回87%OFF</p>
+        <button onclick="closeSpecialPopup()" style="
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        ">特別価格で始める</button>
+    </div>
+
+    <!-- 離脱防止モーダル -->
+    <div id="exit-modal" class="exit-modal">
+        <div class="exit-modal-content">
+            <h2 style="color:#ff0000;margin-bottom:20px;">⚠️ ちょっと待って！</h2>
+            <p style="color:#333;margin-bottom:20px;">今なら特別に<br><span style="font-size:2em;color:#ff0000;">90%OFF</span><br>でご提供します！</p>
+            <p style="color:#666;margin-bottom:20px;">このチャンスは二度とありません</p>
+            <button onclick="goToStripe()" style="
+                background: linear-gradient(45deg, #ff0000, #ff6600);
+                color: white;
+                border: none;
+                padding: 15px 40px;
+                border-radius: 30px;
+                font-size: 18px;
+                cursor: pointer;
+                font-weight: bold;
+                animation: pulse 1s infinite;
+            ">今すぐ90%OFFで始める</button>
+            <br><br>
+            <button onclick="closeExitModal()" style="
+                background: none;
+                border: none;
+                color: #999;
+                cursor: pointer;
+                text-decoration: underline;
+            ">いいえ、結構です</button>
         </div>
     </div>
     
     <script>
-        // カウントダウン
+        // Stripe URL定義（一箇所で管理）
+        const STRIPE_URL = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
+
+        // カウントダウンタイマー
         setInterval(() => {
             const now = new Date();
             const tonight = new Date();
@@ -233,12 +304,14 @@
                 `🔴 現在${count}名が鑑定中`;
         }, 3000);
         
-        // ポップアップ
+        // ポップアップ通知
         setInterval(() => {
             const messages = [
                 '東京都のA様が申し込みました',
                 '大阪府のK様が有料プランに登録',
-                '福岡県のM様が占いを完了'
+                '福岡県のM様が占いを完了',
+                '神奈川県のS様がVIPプランに申し込み',
+                '愛知県のT様が友達を招待しました'
             ];
             const popup = document.createElement('div');
             popup.className = 'popup';
@@ -246,250 +319,169 @@
             document.body.appendChild(popup);
             setTimeout(() => popup.remove(), 4000);
         }, 8000);
+
+        // 初回訪問ポップアップ
+        setTimeout(() => {
+            const popup = document.getElementById('special-popup');
+            const visitorNum = Math.floor(Math.random() * 100) + 1;
+            document.getElementById('visitor-number').textContent = visitorNum;
+            popup.style.display = 'block';
+        }, 2000);
+
+        // 特別ポップアップを閉じる
+        function closeSpecialPopup() {
+            document.getElementById('special-popup').style.display = 'none';
+            // Stripeへリダイレクト
+            window.location.href = STRIPE_URL;
+        }
+
+        // 離脱防止
+        let exitIntentShown = false;
+        document.addEventListener('mouseout', (e) => {
+            if (e.clientY < 10 && !exitIntentShown) {
+                exitIntentShown = true;
+                document.getElementById('exit-modal').style.display = 'flex';
+            }
+        });
+
+        // 離脱モーダルを閉じる
+        function closeExitModal() {
+            document.getElementById('exit-modal').style.display = 'none';
+        }
+
+        // Stripeへ移動
+        function goToStripe() {
+            window.location.href = STRIPE_URL;
+        }
         
         // 占い開始
         function startFortune(type) {
             document.getElementById('form-section').style.display = 'block';
+            document.getElementById('fortune-selection').style.display = 'none';
             if(type) localStorage.setItem('fortuneType', type);
         }
+
+        // 占いロジック
+        const fortuneTelling = {
+            astrology: function(name, birthdate) {
+                const date = new Date(birthdate);
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                
+                let zodiac = '';
+                if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) zodiac = '牡羊座';
+                else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) zodiac = '牡牛座';
+                else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) zodiac = '双子座';
+                else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) zodiac = '蟹座';
+                else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) zodiac = '獅子座';
+                else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) zodiac = '乙女座';
+                else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) zodiac = '天秤座';
+                else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) zodiac = '蠍座';
+                else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) zodiac = '射手座';
+                else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) zodiac = '山羊座';
+                else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) zodiac = '水瓶座';
+                else zodiac = '魚座';
+                
+                return `
+                    <h2>${name}様は${zodiac}です</h2>
+                    <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:10px;margin:20px 0;">
+                        <h3>🌟 恋愛運</h3>
+                        <p>${name}様の恋愛運は今、特別な転機を迎えています。</p>
+                        <p>${zodiac}の持つ魅力が最大限に発揮される時期です。</p>
+                        <p>特に今月の15日前後は重要な出会いの可能性が...</p>
+                    </div>
+                    <div style="filter:blur(3px);background:rgba(255,255,255,0.05);padding:20px;border-radius:10px;position:relative;">
+                        <p>しかし、${name}様には注意すべき時期があります。</p>
+                        <p>金運では驚くべき変化が...</p>
+                        <p>健康面では${zodiac}特有の...</p>
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;text-align:center;">
+                            <p style="color:gold;font-size:1.2em;">💫 詳細を解放 💫</p>
+                            <a href="${STRIPE_URL}" class="cta-button" style="margin-top:10px;">
+                                今だけ480円
+                            </a>
+                        </div>
+                    </div>
+                `;
+            },
+            
+            tarot: function(name) {
+                const cards = [
+                    '愚者：新しい始まり',
+                    '魔術師：創造力',
+                    '女教皇：直感',
+                    '女帝：豊穣',
+                    '皇帝：権威',
+                    '教皇：伝統',
+                    '恋人：選択',
+                    '戦車：勝利',
+                    '力：内なる強さ',
+                    '隠者：内省'
+                ];
+                
+                const past = cards[Math.floor(Math.random() * cards.length)];
+                const present = cards[Math.floor(Math.random() * cards.length)];
+                const future = cards[Math.floor(Math.random() * cards.length)];
+                
+                return `
+                    <h2>${name}様のタロット占い結果</h2>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin:20px 0;">
+                        <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;">
+                            <h4>過去</h4>
+                            <p>${past}</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;">
+                            <h4>現在</h4>
+                            <p>${present}</p>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;">
+                            <h4>未来</h4>
+                            <p>${future}</p>
+                        </div>
+                    </div>
+                    <div style="filter:blur(3px);padding:20px;position:relative;">
+                        <p>カードが示す${name}様の本当の運命は...</p>
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;">
+                            <a href="${STRIPE_URL}" class="cta-button">
+                                完全解釈を見る
+                            </a>
+                        </div>
+                    </div>
+                `;
+            }
+        };
         
         // 結果表示
         function showResult() {
             const name = document.getElementById('name').value || 'あなた';
+            const birthdate = document.getElementById('birthdate').value;
+            const fortuneType = localStorage.getItem('fortuneType') || 'astrology';
+            
+            let resultHTML = '';
+            
+            if (fortuneType === 'tarot') {
+                resultHTML = fortuneTelling.tarot(name);
+            } else {
+                resultHTML = fortuneTelling.astrology(name, birthdate || '2000-01-01');
+            }
+            
             document.getElementById('result-section').style.display = 'block';
-            document.getElementById('result-name').textContent = `${name}様の運命`;
-            document.getElementById('result-text').innerHTML = `
-                ${name}様、驚くべきことに、あなたには特別な才能が眠っています。<br><br>
-                近い将来、人生を変える重要な出会いが訪れるでしょう。<br><br>
-                しかし、注意すべき時期があり...
+            document.getElementById('result-section').innerHTML = `
+                <div style="max-width:800px;margin:0 auto;padding:20px;">
+                    ${resultHTML}
+                </div>
             `;
+            
             document.getElementById('form-section').style.display = 'none';
+            
+            // 結果を保存
+            const results = JSON.parse(localStorage.getItem('fortuneResults') || '[]');
+            results.push({
+                name: name,
+                type: fortuneType,
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('fortuneResults', JSON.stringify(results));
         }
     </script>
 </body>
 </html>
-<!-- 既存のコードの<script>タグ内に以下を追加 -->
-<script>
-// 既存のコードの後に追加
-
-// ページ読み込み時に実行
-window.addEventListener('load', function() {
-    // 初回訪問メッセージ
-    setTimeout(() => {
-        const welcome = document.createElement('div');
-        welcome.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            z-index: 10000;
-            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
-            animation: fadeIn 0.5s;
-        `;
-        welcome.innerHTML = `
-            <h2 style="margin-bottom:15px;">🌟 特別なお知らせ 🌟</h2>
-            <p style="margin-bottom:20px;">あなたは選ばれし${Math.floor(Math.random() * 100) + 1}人目の訪問者です！</p>
-            <p style="color:#FFD700;font-size:1.2em;margin-bottom:20px;">今だけ初回87%OFF</p>
-            <button onclick="this.parentElement.remove()" style="
-                background: linear-gradient(45deg, #FFD700, #FFA500);
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 25px;
-                font-size: 16px;
-                cursor: pointer;
-                font-weight: bold;
-            ">特別価格で始める</button>
-        `;
-        document.body.appendChild(welcome);
-    }, 2000);
-
-    // 離脱防止強化
-    let exitIntent = false;
-    document.addEventListener('mouseout', function(e) {
-        if (e.clientY < 10 && !exitIntent) {
-            exitIntent = true;
-            const modal = document.createElement('div');
-            modal.style.cssText = `
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0,0,0,0.8);
-                z-index: 10000;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            `;
-            modal.innerHTML = `
-                <div style="background:white;padding:40px;border-radius:20px;text-align:center;max-width:400px;">
-                    <h2 style="color:#ff0000;margin-bottom:20px;">⚠️ ちょっと待って！</h2>
-                    <p style="color:#333;margin-bottom:20px;">今なら特別に<br><span style="font-size:2em;color:#ff0000;">90%OFF</span><br>でご提供します！</p>
-                    <p style="color:#666;margin-bottom:20px;">このチャンスは二度とありません</p>
-                    <button onclick="this.parentElement.parentElement.remove()" style="
-                        background: linear-gradient(45deg, #ff0000, #ff6600);
-                        color: white;
-                        border: none;
-                        padding: 15px 40px;
-                        border-radius: 30px;
-                        font-size: 18px;
-                        cursor: pointer;
-                        font-weight: bold;
-                        animation: pulse 1s infinite;
-                    ">今すぐ90%OFFで始める</button>
-                </div>
-            `;
-            document.body.appendChild(modal);
-        }
-    });
-});
-
-// スクロール誘導
-document.querySelectorAll('.fortune-card').forEach(card => {
-    card.addEventListener('click', function() {
-        // カード選択時のエフェクト
-        this.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            this.style.transform = '';
-        }, 200);
-    });
-});
-</script>
-<!-- </body>タグの直前に追加 -->
-<script>
-// 占いロジック本体
-const fortuneTelling = {
-    // 西洋占星術
-    astrology: function(name, birthdate) {
-        const date = new Date(birthdate);
-        const month = date.getMonth() + 1;
-        const day = date.getDate();
-        
-        let zodiac = '';
-        if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) zodiac = '牡羊座';
-        else if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) zodiac = '牡牛座';
-        else if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) zodiac = '双子座';
-        else if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) zodiac = '蟹座';
-        else if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) zodiac = '獅子座';
-        else if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) zodiac = '乙女座';
-        else if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) zodiac = '天秤座';
-        else if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) zodiac = '蠍座';
-        else if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) zodiac = '射手座';
-        else if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) zodiac = '山羊座';
-        else if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) zodiac = '水瓶座';
-        else zodiac = '魚座';
-        
-        return `
-            <h3>${name}様は${zodiac}です</h3>
-            <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:10px;margin:20px 0;">
-                <h4>🌟 恋愛運</h4>
-                <p>${name}様の恋愛運は今、特別な転機を迎えています。${zodiac}の持つ魅力が最大限に発揮される時期です。</p>
-                <p>特に今月の15日前後は重要な出会いの可能性が...</p>
-            </div>
-            <div style="filter:blur(3px);background:rgba(255,255,255,0.05);padding:20px;border-radius:10px;position:relative;">
-                <p>しかし、${name}様には注意すべき時期があります。特に...</p>
-                <p>金運では驚くべき変化が...</p>
-                <p>健康面では${zodiac}特有の...</p>
-                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;text-align:center;">
-                    <p style="color:gold;font-size:1.2em;">💫 詳細を解放 💫</p>
-                    <p style="color:white;">この先の重要な情報を見る</p>
-                    <a href="https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200
-                " class="cta-button" style="margin-top:10px;">
-                        今だけ480円
-                    </a>
-                </div>
-            </div>
-        `;
-    },
-    
-    // タロット
-    tarot: function(name) {
-        const cards = [
-            '愚者：新しい始まり、無限の可能性',
-            '魔術師：創造力、実現力',
-            '女教皇：直感、内なる声',
-            '女帝：豊穣、母性',
-            '皇帝：権威、安定',
-            '教皇：伝統、精神性',
-            '恋人：選択、調和',
-            '戦車：勝利、意志力',
-            '力：内なる強さ、忍耐',
-            '隠者：内省、真理の探求'
-        ];
-        
-        const past = cards[Math.floor(Math.random() * cards.length)];
-        const present = cards[Math.floor(Math.random() * cards.length)];
-        const future = cards[Math.floor(Math.random() * cards.length)];
-        
-        return `
-            <h3>${name}様のタロット占い結果</h3>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:20px 0;">
-                <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;">
-                    <h4>過去</h4>
-                    <p>${past}</p>
-                </div>
-                <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;">
-                    <h4>現在</h4>
-                    <p>${present}</p>
-                </div>
-                <div style="background:rgba(255,255,255,0.1);padding:15px;border-radius:10px;">
-                    <h4>未来</h4>
-                    <p>${future}</p>
-                </div>
-            </div>
-            <div style="filter:blur(3px);padding:20px;position:relative;">
-                <p>カードが示す${name}様の本当の運命は...</p>
-                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;">
-                    <a href="https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200" class="cta-button">
-                        完全解釈を見る
-                    </a>
-                </div>
-            </div>
-        `;
-    }
-};
-
-// 占い結果を表示する関数を修正
-function showResult() {
-    const name = document.getElementById('name').value || 'あなた';
-    const birthdate = document.getElementById('birthdate').value;
-    const fortuneType = localStorage.getItem('fortuneType') || 'astrology';
-    
-    let resultHTML = '';
-    
-    switch(fortuneType) {
-        case 'astrology':
-            resultHTML = fortuneTelling.astrology(name, birthdate);
-            break;
-        case 'tarot':
-            resultHTML = fortuneTelling.tarot(name);
-            break;
-        default:
-            resultHTML = fortuneTelling.astrology(name, birthdate);
-    }
-    
-    document.getElementById('result-section').style.display = 'block';
-    document.getElementById('result-section').innerHTML = `
-        <div style="max-width:800px;margin:0 auto;padding:20px;">
-            ${resultHTML}
-        </div>
-    `;
-    
-    document.getElementById('form-section').style.display = 'none';
-    
-    // 結果を保存
-    const results = JSON.parse(localStorage.getItem('fortuneResults') || '[]');
-    results.push({
-        name: name,
-        type: fortuneType,
-        date: new Date().toISOString()
-    });
-    localStorage.setItem('fortuneResults', JSON.stringify(results));
-}
-</script>
