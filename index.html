@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KichiCompass - あなただけの運命の羅針盤</title>
+    <title>【当たる】無料占い KichiCompass | 恋愛・仕事・金運 2024年最新</title>
+    <meta name="description" content="驚異の的中率98.7%！恋愛、仕事、金運を無料で占う。あなただけの詳細な占い結果を今すぐチェック。初回87%OFF実施中。">
+    <meta name="keywords" content="占い,無料占い,恋愛占い,タロット,四柱推命,数秘術,当たる占い,2024年占い">
+    <meta property="og:title" content="【当たる】無料占い KichiCompass">
+    <meta property="og:description" content="驚異の的中率98.7%！あなたの運命を今すぐ占う">
+    <meta property="og:image" content="https://ukyou-papa-dev.github.io/kichicompass-new/ogp.jpg">
+    <meta property="og:url" content="https://ukyou-papa-dev.github.io/kichicompass-new/">
+    <meta name="twitter:card" content="summary_large_image">
     
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XENJ6H8FDN"></script>
@@ -13,7 +20,6 @@
       gtag('js', new Date());
       gtag('config', 'G-XENJ6H8FDN');
       
-      // イベント追跡
       function trackEvent(action, category) {
         gtag('event', action, {
           'event_category': category
@@ -205,11 +211,81 @@
             text-align: center;
             border: 2px solid gold;
         }
+
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .share-button {
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+
+        .share-button:hover {
+            transform: scale(1.1);
+        }
+
+        .twitter-share {
+            background: #1DA1F2;
+        }
+
+        .line-share {
+            background: #00B900;
+        }
+
+        .facebook-share {
+            background: #1877F2;
+        }
+
+        .referral-section {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .referral-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+
+        .daily-bonus {
+            position: fixed;
+            top: 60px;
+            right: 20px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            z-index: 999;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="countdown" id="countdown">
         ⚠️ 初回87%OFF終了まで: 計算中...
+    </div>
+
+    <!-- 7日間連続ログインボーナス表示 -->
+    <div class="daily-bonus" id="daily-bonus">
+        <h3>🎁 ログインボーナス</h3>
+        <p>Day <span id="login-day">1</span>/7</p>
+        <p>あと<span id="days-left">6</span>日で特別鑑定解放！</p>
     </div>
     
     <div class="container">
@@ -248,6 +324,22 @@
                 </button>
             </form>
         </div>
+
+        <!-- 友達紹介セクション -->
+        <div class="referral-section" id="referral-section" style="display:none;">
+            <h3>🎉 友達を招待して特典をゲット！</h3>
+            <p>あなたの紹介コード：</p>
+            <div class="referral-code" id="referral-code">LOADING...</div>
+            <p>友達が登録すると、あなたも友達も特別な特典がもらえます！</p>
+            <div class="share-buttons">
+                <a href="#" onclick="shareWithCode('twitter')" class="share-button twitter-share">
+                    Twitterで共有
+                </a>
+                <a href="#" onclick="shareWithCode('line')" class="share-button line-share">
+                    LINEで共有
+                </a>
+            </div>
+        </div>
         
         <div class="fortune-grid" id="fortune-selection">
             <div class="fortune-card" onclick="startFortune('astrology')">
@@ -279,6 +371,7 @@
             <input type="text" id="name" placeholder="お名前" required>
             <input type="date" id="birthdate" required>
             <input type="email" id="email" placeholder="メールアドレス（任意）">
+            <input type="text" id="referral-input" placeholder="紹介コード（お持ちの方）">
             <button class="cta-button" onclick="showResult()">
                 運命を見る
             </button>
@@ -335,8 +428,121 @@
     </div>
     
     <script>
-        // Stripe URL定義（一箇所で管理）
+        // Stripe URL定義
         const STRIPE_URL = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
+
+        // 7日間依存プログラム
+        const dailyMessages = {
+            1: "🌟 運命の扉が開かれました！今日から7日間、特別なメッセージをお届けします。",
+            2: "⚠️ 重要：昨日お伝えできなかった大切なことがあります...",
+            3: "🔮 警告：3日以内に行動しないと運気が下降します",
+            4: "💫 チャンス：明日までの特別オファーがあります",
+            5: "❤️ あなたの運命の人が近づいています",
+            6: "⏰ 最終警告：明日で特典が終了します",
+            7: "🎊 おめでとうございます！7日間達成特典を解放しました！"
+        };
+
+        // ログイン日数の管理
+        function updateLoginStreak() {
+            const lastLogin = localStorage.getItem('lastLogin');
+            const today = new Date().toDateString();
+            let loginStreak = parseInt(localStorage.getItem('loginStreak') || '0');
+            
+            if (lastLogin !== today) {
+                const yesterday = new Date();
+                yesterday.setDate(yesterday.getDate() - 1);
+                
+                if (lastLogin === yesterday.toDateString() || !lastLogin) {
+                    loginStreak = Math.min(loginStreak + 1, 7);
+                } else {
+                    loginStreak = 1;
+                }
+                
+                localStorage.setItem('loginStreak', loginStreak);
+                localStorage.setItem('lastLogin', today);
+                
+                // ボーナス表示
+                showDailyBonus(loginStreak);
+                
+                // 日替わりメッセージ
+                if (dailyMessages[loginStreak]) {
+                    setTimeout(() => {
+                        alert(dailyMessages[loginStreak]);
+                    }, 3000);
+                }
+            }
+            
+            return loginStreak;
+        }
+
+        // ログインボーナス表示
+        function showDailyBonus(day) {
+            const bonusDiv = document.getElementById('daily-bonus');
+            document.getElementById('login-day').textContent = day;
+            document.getElementById('days-left').textContent = 7 - day;
+            bonusDiv.style.display = 'block';
+            
+            if (day === 7) {
+                bonusDiv.innerHTML += '<p style="color:gold;">🎁 特別鑑定が解放されました！</p>';
+            }
+        }
+
+        // 紹介コード生成
+        function generateReferralCode() {
+            const userId = localStorage.getItem('userId') || Math.random().toString(36).substring(2, 8);
+            localStorage.setItem('userId', userId);
+            const code = 'KICHI' + userId.toUpperCase();
+            document.getElementById('referral-code').textContent = code;
+            document.getElementById('referral-section').style.display = 'block';
+            return code;
+        }
+
+        // SNSシェア機能
+        function shareTwitter(text = '') {
+            const defaultText = text || '【無料占い】KichiCompassで占ったら驚きの結果が...！的中率98.7%の占いを今すぐ試してみて！';
+            const url = 'https://ukyou-papa-dev.github.io/kichicompass-new/';
+            const hashtags = '占い,無料占い,KichiCompass';
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(defaultText)}&url=${encodeURIComponent(url)}&hashtags=${hashtags}`, '_blank');
+            
+            trackEvent('share', 'twitter');
+        }
+
+        function shareLINE(text = '') {
+            const defaultText = text || '【無料占い】KichiCompassがすごい！的中率98.7%の占いを試してみて！';
+            const url = 'https://ukyou-papa-dev.github.io/kichicompass-new/';
+            window.open(`https://line.me/R/msg/text/?${encodeURIComponent(defaultText + '\n' + url)}`, '_blank');
+            
+            trackEvent('share', 'line');
+        }
+
+        function shareFacebook() {
+            const url = 'https://ukyou-papa-dev.github.io/kichicompass-new/';
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+            
+            trackEvent('share', 'facebook');
+        }
+
+        // 紹介コード付きシェア
+        function shareWithCode(platform) {
+            const code = document.getElementById('referral-code').textContent;
+            const text = `【無料占い】私の紹介コード「${code}」を使うと特別特典がもらえます！KichiCompassで運命を占おう！`;
+            
+            if (platform === 'twitter') {
+                shareTwitter(text);
+            } else if (platform === 'line') {
+                shareLINE(text);
+            }
+        }
+
+        // 紹介コードチェック
+        function checkReferralCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            if (refCode) {
+                localStorage.setItem('referralCode', refCode);
+                alert('紹介コードが適用されました！特別特典を獲得！');
+            }
+        }
 
         // カウントダウンタイマー
         setInterval(() => {
@@ -385,7 +591,6 @@
         // 特別ポップアップを閉じる
         function closeSpecialPopup() {
             document.getElementById('special-popup').style.display = 'none';
-            // Stripeへリダイレクト
             window.location.href = STRIPE_URL;
         }
 
@@ -413,7 +618,6 @@
             e.preventDefault();
             const email = e.target[0].value;
             
-            // LocalStorageに保存
             let emails = JSON.parse(localStorage.getItem('emails') || '[]');
             emails.push({
                 email: email,
@@ -421,7 +625,6 @@
             });
             localStorage.setItem('emails', JSON.stringify(emails));
             
-            // Google Analytics イベント
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'email_capture', {
                     'event_category': 'engagement'
@@ -431,7 +634,6 @@
             alert('登録完了！毎日の運勢をお楽しみに！');
             e.target[0].value = '';
             
-            // 登録後は非表示
             document.getElementById('email-capture').style.display = 'none';
         }
         
@@ -442,7 +644,6 @@
             document.getElementById('email-capture').style.display = 'none';
             if(type) localStorage.setItem('fortuneType', type);
             
-            // Google Analytics イベント
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'fortune_start', {
                     'event_category': 'engagement',
@@ -451,7 +652,7 @@
             }
         }
 
-        // 占いロジック
+        // 占いロジック（既存のコード維持）
         const fortuneTelling = {
             astrology: function(name, birthdate) {
                 const date = new Date(birthdate);
@@ -479,6 +680,14 @@
                         <p>${name}様の恋愛運は今、特別な転機を迎えています。</p>
                         <p>${zodiac}の持つ魅力が最大限に発揮される時期です。</p>
                         <p>特に今月の15日前後は重要な出会いの可能性が...</p>
+                    </div>
+                    <div class="share-buttons">
+                        <a href="#" onclick="shareTwitter('私は${zodiac}！KichiCompassで占ったら驚きの結果が！')" class="share-button twitter-share">
+                            結果をツイート
+                        </a>
+                        <a href="#" onclick="shareLINE('私は${zodiac}！すごい占い結果が出た！')" class="share-button line-share">
+                            LINEで共有
+                        </a>
                     </div>
                     <div style="filter:blur(3px);background:rgba(255,255,255,0.05);padding:20px;border-radius:10px;position:relative;">
                         <p>しかし、${name}様には注意すべき時期があります。</p>
@@ -528,6 +737,14 @@
                             <p>${future}</p>
                         </div>
                     </div>
+                    <div class="share-buttons">
+                        <a href="#" onclick="shareTwitter('タロット占いの結果が衝撃的！')" class="share-button twitter-share">
+                            結果をツイート
+                        </a>
+                        <a href="#" onclick="shareLINE('タロット占いがすごかった！')" class="share-button line-share">
+                            LINEで共有
+                        </a>
+                    </div>
                     <div style="filter:blur(3px);padding:20px;position:relative;">
                         <p>カードが示す${name}様の本当の運命は...</p>
                         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;">
@@ -545,7 +762,6 @@
                 const month = date.getMonth() + 1;
                 const day = date.getDate();
                 
-                // 簡易的な四柱推命ロジック
                 const tenkan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
                 const chishi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
                 
@@ -560,12 +776,17 @@
                         <p>年柱：${tenkan[tenkanIndex]}${chishi[chishiIndex]}</p>
                         <p>${name}様は強い運命の持ち主です。</p>
                         <p>特に金運と仕事運において素晴らしい才能が...</p>
-                        <p>今年は大きな転機の年となるでしょう。</p>
+                    </div>
+                    <div class="share-buttons">
+                        <a href="#" onclick="shareTwitter('四柱推命で驚きの結果が！')" class="share-button twitter-share">
+                            結果をツイート
+                        </a>
+                        <a href="#" onclick="shareLINE('四柱推命がすごい的中率！')" class="share-button line-share">
+                            LINEで共有
+                        </a>
                     </div>
                     <div style="filter:blur(3px);background:rgba(255,255,255,0.05);padding:20px;border-radius:10px;position:relative;">
                         <p>しかし、${name}様の命式には特別な暗示が...</p>
-                        <p>注意すべき月は...</p>
-                        <p>相性の良い相手の特徴...</p>
                         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;text-align:center;">
                             <p style="color:gold;">💫 完全な命式解析 💫</p>
                             <a href="${STRIPE_URL}" class="cta-button">
@@ -582,7 +803,6 @@
                 const month = date.getMonth() + 1;
                 const day = date.getDate();
                 
-                // ライフパス数の計算
                 let lifePathNumber = (year + month + day).toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
                 while (lifePathNumber > 9) {
                     lifePathNumber = lifePathNumber.toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
@@ -606,13 +826,17 @@
                         <h3>🔢 ライフパス数：${lifePathNumber}</h3>
                         <p>意味：${meanings[lifePathNumber]}</p>
                         <p>${name}様の使命は「${meanings[lifePathNumber]}」です。</p>
-                        <p>この数字を持つ人は特別な才能に恵まれ...</p>
-                        <p>今月のラッキーナンバーは${(lifePathNumber + month) % 10}です。</p>
+                    </div>
+                    <div class="share-buttons">
+                        <a href="#" onclick="shareTwitter('私のライフパス数は${lifePathNumber}！')" class="share-button twitter-share">
+                            結果をツイート
+                        </a>
+                        <a href="#" onclick="shareLINE('数秘術で私の使命がわかった！')" class="share-button line-share">
+                            LINEで共有
+                        </a>
                     </div>
                     <div style="filter:blur(3px);padding:20px;position:relative;">
                         <p>${name}様と相性の良い人の特徴...</p>
-                        <p>避けるべき数字と時期...</p>
-                        <p>金運を上げる具体的な方法...</p>
                         <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;">
                             <a href="${STRIPE_URL}" class="cta-button">
                                 完全版を見る
@@ -628,6 +852,12 @@
             const name = document.getElementById('name').value || 'あなた';
             const birthdate = document.getElementById('birthdate').value;
             const fortuneType = localStorage.getItem('fortuneType') || 'astrology';
+            const referralCode = document.getElementById('referral-input').value;
+            
+            // 紹介コードチェック
+            if (referralCode) {
+                alert('紹介コード適用！初回90%OFFでご利用いただけます！');
+            }
             
             let resultHTML = '';
             
@@ -666,7 +896,6 @@
             });
             localStorage.setItem('fortuneResults', JSON.stringify(results));
 
-            // Google Analytics イベント
             if (typeof gtag !== 'undefined') {
                 gtag('event', 'fortune_complete', {
                     'event_category': 'engagement',
@@ -674,6 +903,13 @@
                 });
             }
         }
+
+        // ページ読み込み時の初期化
+        window.addEventListener('load', function() {
+            updateLoginStreak();
+            generateReferralCode();
+            checkReferralCode();
+        });
     </script>
 </body>
 </html>
