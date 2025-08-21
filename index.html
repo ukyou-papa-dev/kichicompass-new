@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KichiCompass - あなただけの運命の羅針盤</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Hiragino Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .countdown {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: linear-gradient(90deg, #ff0000, #ff6600);
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            z-index: 1000;
+            animation: flash 1s infinite;
+        }
+        
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 80px 20px 40px;
+        }
+        
+        h1 {
+            font-size: 3em;
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .visitor-count {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .visitor-badge {
+            display: inline-block;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 25px;
+            border-radius: 25px;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 18px;
+        }
+        
+        .fortune-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .fortune-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+        
+        .fortune-card:hover {
+            transform: translateY(-10px) scale(1.05);
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .fortune-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: white;
+            padding: 18px 50px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.3em;
+            margin: 20px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 5px 20px rgba(255,215,0,0.5);
+            border: none;
+            cursor: pointer;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,215,0,0.7); }
+            50% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(255,215,0,0); }
+            100% { transform: scale(1); }
+        }
+        
+        .popup {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            color: #333;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s;
+            z-index: 999;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(-150%); }
+            to { transform: translateX(0); }
+        }
+        
+        #form-section, #result-section {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        input {
+            width: 100%;
+            max-width: 400px;
+            padding: 15px;
+            margin: 10px auto;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="countdown" id="countdown">
+        ⚠️ 初回87%OFF終了まで: 計算中...
+    </div>
+    
+    <div class="container">
+        <h1>🔮 KichiCompass 🔮</h1>
+        <p style="text-align:center;font-size:1.2em;">あなただけの運命の羅針盤</p>
+        
+        <div class="visitor-count">
+            <div class="visitor-badge" id="visitors">
+                🔴 現在523名が鑑定中
+            </div>
+        </div>
+        
+        <div class="fortune-grid">
+            <div class="fortune-card" onclick="startFortune('astrology')">
+                <h3>⭐ 西洋占星術</h3>
+                <p>12星座が導く運命</p>
+            </div>
+            <div class="fortune-card" onclick="startFortune('tarot')">
+                <h3>🎴 タロット占い</h3>
+                <p>78枚が示す真実</p>
+            </div>
+            <div class="fortune-card" onclick="startFortune('shichu')">
+                <h3>🐉 四柱推命</h3>
+                <p>東洋最高の的中率</p>
+            </div>
+            <div class="fortune-card" onclick="startFortune('numerology')">
+                <h3>🔢 数秘術</h3>
+                <p>数字が導く使命</p>
+            </div>
+        </div>
+        
+        <div style="text-align:center;">
+            <button class="cta-button" onclick="startFortune()">
+                無料で今すぐ占う
+            </button>
+        </div>
+        
+        <div id="form-section">
+            <h2>あなたの情報を入力</h2>
+            <input type="text" id="name" placeholder="お名前" required>
+            <input type="date" id="birthdate" required>
+            <input type="email" id="email" placeholder="メールアドレス">
+            <button class="cta-button" onclick="showResult()">
+                運命を見る
+            </button>
+        </div>
+        
+        <div id="result-section">
+            <h2 id="result-name">結果</h2>
+            <div style="background:rgba(255,255,255,0.1);padding:30px;border-radius:15px;margin:20px 0;">
+                <p id="result-text"></p>
+            </div>
+            <div style="filter:blur(5px);background:rgba(255,255,255,0.05);padding:30px;border-radius:15px;position:relative;">
+                <p>さらに詳しい内容が...</p>
+                <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.9);padding:20px;border-radius:10px;">
+                    <p style="color:gold;font-size:1.2em;">💫 完全版を解放 💫</p>
+                    <a href="https://buy.stripe.com/test_xxx" class="cta-button">
+                        今だけ480円
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // カウントダウン
+        setInterval(() => {
+            const now = new Date();
+            const tonight = new Date();
+            tonight.setHours(23, 59, 59);
+            const diff = tonight - now;
+            const h = Math.floor(diff / 3600000);
+            const m = Math.floor((diff % 3600000) / 60000);
+            const s = Math.floor((diff % 60000) / 1000);
+            document.getElementById('countdown').textContent = 
+                `⚠️ 初回87%OFF終了まで: ${h}時間${m}分${s}秒`;
+        }, 1000);
+        
+        // 訪問者数
+        setInterval(() => {
+            const count = 500 + Math.floor(Math.random() * 150);
+            document.getElementById('visitors').textContent = 
+                `🔴 現在${count}名が鑑定中`;
+        }, 3000);
+        
+        // ポップアップ
+        setInterval(() => {
+            const messages = [
+                '東京都のA様が申し込みました',
+                '大阪府のK様が有料プランに登録',
+                '福岡県のM様が占いを完了'
+            ];
+            const popup = document.createElement('div');
+            popup.className = 'popup';
+            popup.textContent = messages[Math.floor(Math.random() * messages.length)];
+            document.body.appendChild(popup);
+            setTimeout(() => popup.remove(), 4000);
+        }, 8000);
+        
+        // 占い開始
+        function startFortune(type) {
+            document.getElementById('form-section').style.display = 'block';
+            if(type) localStorage.setItem('fortuneType', type);
+        }
+        
+        // 結果表示
+        function showResult() {
+            const name = document.getElementById('name').value || 'あなた';
+            document.getElementById('result-section').style.display = 'block';
+            document.getElementById('result-name').textContent = `${name}様の運命`;
+            document.getElementById('result-text').innerHTML = `
+                ${name}様、驚くべきことに、あなたには特別な才能が眠っています。<br><br>
+                近い将来、人生を変える重要な出会いが訪れるでしょう。<br><br>
+                しかし、注意すべき時期があり...
+            `;
+            document.getElementById('form-section').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
