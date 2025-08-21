@@ -268,3 +268,96 @@
     </script>
 </body>
 </html>
+<!-- 既存のコードの<script>タグ内に以下を追加 -->
+<script>
+// 既存のコードの後に追加
+
+// ページ読み込み時に実行
+window.addEventListener('load', function() {
+    // 初回訪問メッセージ
+    setTimeout(() => {
+        const welcome = document.createElement('div');
+        welcome.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 10000;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            animation: fadeIn 0.5s;
+        `;
+        welcome.innerHTML = `
+            <h2 style="margin-bottom:15px;">🌟 特別なお知らせ 🌟</h2>
+            <p style="margin-bottom:20px;">あなたは選ばれし${Math.floor(Math.random() * 100) + 1}人目の訪問者です！</p>
+            <p style="color:#FFD700;font-size:1.2em;margin-bottom:20px;">今だけ初回87%OFF</p>
+            <button onclick="this.parentElement.remove()" style="
+                background: linear-gradient(45deg, #FFD700, #FFA500);
+                color: white;
+                border: none;
+                padding: 12px 30px;
+                border-radius: 25px;
+                font-size: 16px;
+                cursor: pointer;
+                font-weight: bold;
+            ">特別価格で始める</button>
+        `;
+        document.body.appendChild(welcome);
+    }, 2000);
+
+    // 離脱防止強化
+    let exitIntent = false;
+    document.addEventListener('mouseout', function(e) {
+        if (e.clientY < 10 && !exitIntent) {
+            exitIntent = true;
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            modal.innerHTML = `
+                <div style="background:white;padding:40px;border-radius:20px;text-align:center;max-width:400px;">
+                    <h2 style="color:#ff0000;margin-bottom:20px;">⚠️ ちょっと待って！</h2>
+                    <p style="color:#333;margin-bottom:20px;">今なら特別に<br><span style="font-size:2em;color:#ff0000;">90%OFF</span><br>でご提供します！</p>
+                    <p style="color:#666;margin-bottom:20px;">このチャンスは二度とありません</p>
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: linear-gradient(45deg, #ff0000, #ff6600);
+                        color: white;
+                        border: none;
+                        padding: 15px 40px;
+                        border-radius: 30px;
+                        font-size: 18px;
+                        cursor: pointer;
+                        font-weight: bold;
+                        animation: pulse 1s infinite;
+                    ">今すぐ90%OFFで始める</button>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+    });
+});
+
+// スクロール誘導
+document.querySelectorAll('.fortune-card').forEach(card => {
+    card.addEventListener('click', function() {
+        // カード選択時のエフェクト
+        this.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            this.style.transform = '';
+        }, 200);
+    });
+});
+</script>
