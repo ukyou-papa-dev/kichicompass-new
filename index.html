@@ -1984,3 +1984,960 @@ function enhanceResultsWithTriggers(originalText) {
     50% { box-shadow: 0 0 30px rgba(255, 215, 0, 0.8); }
 }
 </style>
+<!-- 既存のHTMLの</body>タグの前に追加 -->
+<script>
+// ==========================================
+// 段階的課金システム - 究極の心理操作
+// ==========================================
+
+const PaymentPsychology = {
+    // 課金段階の定義（徐々に高額に）
+    stages: [
+        {
+            level: 1,
+            price: 480,
+            originalPrice: 3980,
+            discount: 88,
+            title: "お試し診断",
+            description: "基本的な運勢を確認",
+            bait: "あなたの運命の30%が明らかに...",
+            urgency: "初回限定価格",
+            timer: 300 // 5分
+        },
+        {
+            level: 2,
+            price: 980,
+            originalPrice: 4980,
+            discount: 80,
+            title: "詳細診断",
+            description: "恋愛・金運の詳細",
+            bait: "さらに40%の真実が...",
+            urgency: "2回目の特別価格",
+            timer: 600 // 10分
+        },
+        {
+            level: 3,
+            price: 1980,
+            originalPrice: 5980,
+            discount: 67,
+            title: "完全診断",
+            description: "全ての運勢を網羅",
+            bait: "残り30%には衝撃の事実が...",
+            urgency: "今だけの特別オファー",
+            timer: 900 // 15分
+        },
+        {
+            level: 4,
+            price: 2980,
+            originalPrice: 9800,
+            discount: 70,
+            title: "プレミアム診断",
+            description: "1ヶ月の完全予測",
+            bait: "未来の具体的な日付が判明...",
+            urgency: "VIP限定価格",
+            timer: 1200 // 20分
+        },
+        {
+            level: 5,
+            price: 4980,
+            originalPrice: 19800,
+            discount: 75,
+            title: "マスター診断",
+            description: "3ヶ月の運命マップ",
+            bait: "人生を変える決定的な情報...",
+            urgency: "最終オファー",
+            timer: 1800 // 30分
+        },
+        {
+            level: 6,
+            price: 9800,
+            originalPrice: 39800,
+            discount: 75,
+            title: "年間プログラム",
+            description: "1年間の完全サポート",
+            bait: "もう占いで迷うことはありません...",
+            urgency: "究極の投資",
+            timer: 3600 // 60分
+        },
+        {
+            level: 7,
+            price: 980,
+            originalPrice: 2980,
+            discount: 67,
+            title: "月額プラン",
+            description: "毎月自動更新",
+            bait: "永続的な安心を手に入れる...",
+            urgency: "サブスクリプション",
+            timer: null // 無制限
+        }
+    ],
+
+    // 現在の課金レベル
+    currentLevel: 0,
+
+    // 累計課金額
+    totalSpent: 0,
+
+    // 結果の分割表示システム
+    resultParts: {
+        free: {
+            title: "無料診断結果",
+            content: [
+                "基本性格",
+                "今日の運勢（簡易版）"
+            ],
+            locked: 5
+        },
+        level1: {
+            title: "運命の扉 - 第1章",
+            content: [
+                "恋愛運の真実",
+                "隠された才能"
+            ],
+            locked: 4
+        },
+        level2: {
+            title: "運命の扉 - 第2章",
+            content: [
+                "金運の転機",
+                "人間関係の秘密"
+            ],
+            locked: 3
+        },
+        level3: {
+            title: "運命の扉 - 第3章",
+            content: [
+                "健康運の警告",
+                "キャリアの分岐点"
+            ],
+            locked: 2
+        },
+        level4: {
+            title: "運命の扉 - 最終章",
+            content: [
+                "未来の具体的な日付",
+                "避けるべき危険日",
+                "最高の幸運日"
+            ],
+            locked: 0
+        }
+    },
+
+    // サンクコストを可視化
+    showInvestment() {
+        return `
+            <div class="investment-tracker">
+                <div class="investment-label">あなたの運命への投資</div>
+                <div class="investment-amount">¥${this.totalSpent.toLocaleString()}</div>
+                <div class="investment-progress">
+                    <div class="progress-bar" style="width: ${Math.min(this.currentLevel * 14.3, 100)}%"></div>
+                </div>
+                <div class="investment-message">
+                    ${this.getInvestmentMessage()}
+                </div>
+            </div>
+        `;
+    },
+
+    // 投資額に応じたメッセージ
+    getInvestmentMessage() {
+        if (this.totalSpent === 0) return "運命の扉を開く準備はできていますか？";
+        if (this.totalSpent < 1000) return "運命が動き始めました...";
+        if (this.totalSpent < 3000) return "真実に近づいています...";
+        if (this.totalSpent < 5000) return "もう少しで全てが明らかに...";
+        if (this.totalSpent < 10000) return "運命の核心に到達しました";
+        return "あなたは選ばれし者です";
+    },
+
+    // 段階的な価格表示
+    showPricing(level) {
+        const stage = this.stages[level];
+        const html = `
+            <div class="pricing-card ${level === this.currentLevel ? 'current' : ''} ${level < this.currentLevel ? 'completed' : ''}">
+                ${level === this.currentLevel ? '<div class="recommended-badge">今ここ！</div>' : ''}
+                ${level === 0 ? '<div class="popular-badge">🔥 93%の人が選択</div>' : ''}
+                
+                <h3 class="pricing-title">${stage.title}</h3>
+                <p class="pricing-description">${stage.description}</p>
+                
+                <div class="pricing-amount">
+                    <span class="original-price">¥${stage.originalPrice.toLocaleString()}</span>
+                    <span class="discount-badge">${stage.discount}%OFF</span>
+                </div>
+                
+                <div class="final-price">
+                    <span class="currency">¥</span>
+                    <span class="price-number">${stage.price.toLocaleString()}</span>
+                </div>
+                
+                <div class="pricing-bait">${stage.bait}</div>
+                
+                ${stage.timer ? `
+                    <div class="countdown-timer" data-timer="${stage.timer}">
+                        <span class="timer-label">${stage.urgency}</span>
+                        <span class="timer-display">00:00</span>
+                    </div>
+                ` : ''}
+                
+                <button class="purchase-button" onclick="PaymentPsychology.processPurchase(${level})">
+                    ${level === 6 ? '月額プランで始める' : '今すぐ解放する'}
+                </button>
+                
+                ${level === this.currentLevel && this.currentLevel > 0 ? `
+                    <div class="sunk-cost-reminder">
+                        既に¥${this.totalSpent.toLocaleString()}投資済み。今やめたら全てが無駄に...
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        return html;
+    },
+
+    // 購入処理
+    processPurchase(level) {
+        const stage = this.stages[level];
+        
+        // アニメーション演出
+        this.showProcessingAnimation();
+        
+        setTimeout(() => {
+            // 課金額を追加
+            this.totalSpent += stage.price;
+            this.currentLevel = Math.max(this.currentLevel, level + 1);
+            
+            // LocalStorageに保存
+            localStorage.setItem('paymentLevel', this.currentLevel);
+            localStorage.setItem('totalSpent', this.totalSpent);
+            
+            // 結果を段階的に表示
+            this.revealResults(level);
+            
+            // 次の課金への誘導
+            if (level < 5) {
+                setTimeout(() => {
+                    this.showNextOffer(level + 1);
+                }, 3000);
+            } else if (level === 5) {
+                // 最終段階：サブスクへ誘導
+                this.showSubscriptionOffer();
+            }
+        }, 2000);
+    },
+
+    // 処理中アニメーション
+    showProcessingAnimation() {
+        const overlay = document.createElement('div');
+        overlay.className = 'processing-overlay';
+        overlay.innerHTML = `
+            <div class="processing-content">
+                <div class="processing-spinner"></div>
+                <div class="processing-text">運命を解析中...</div>
+                <div class="processing-subtext">あなただけの特別な結果を準備しています</div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+        
+        setTimeout(() => {
+            overlay.classList.add('show');
+        }, 100);
+    },
+
+    // 結果の段階的表示
+    revealResults(level) {
+        const overlay = document.querySelector('.processing-overlay');
+        if (overlay) {
+            overlay.classList.remove('show');
+            setTimeout(() => overlay.remove(), 300);
+        }
+
+        const resultsHTML = `
+            <div class="revealed-results">
+                <h2 class="results-title">🎉 新たな真実が明らかになりました！</h2>
+                
+                <div class="results-content">
+                    ${this.generateResults(level)}
+                </div>
+                
+                <div class="results-teaser">
+                    <h3>しかし、まだ隠された真実が...</h3>
+                    <div class="locked-content">
+                        ${this.generateLockedContent(level)}
+                    </div>
+                </div>
+                
+                ${this.showInvestment()}
+            </div>
+        `;
+
+        // 結果を表示
+        const container = document.getElementById('step3') || document.body;
+        container.innerHTML = resultsHTML;
+    },
+
+    // レベルに応じた結果生成
+    generateResults(level) {
+        const templates = {
+            0: `
+                <div class="result-item">
+                    <span class="result-emoji">💕</span>
+                    <span class="result-text">あなたの恋愛運は上昇中！特に${this.getRandomDay()}が重要な日になりそうです。</span>
+                </div>
+            `,
+            1: `
+                <div class="result-item">
+                    <span class="result-emoji">💰</span>
+                    <span class="result-text">金運に大きな変化が！${this.getRandomAmount()}円の臨時収入の可能性が...</span>
+                </div>
+            `,
+            2: `
+                <div class="result-item">
+                    <span class="result-emoji">🌟</span>
+                    <span class="result-text">あなたの隠れた才能「${this.getRandomTalent()}」が開花する時期が近づいています。</span>
+                </div>
+            `,
+            3: `
+                <div class="result-item">
+                    <span class="result-emoji">⚠️</span>
+                    <span class="result-text">注意！${this.getRandomWarning()}を避けることで、大きなトラブルを回避できます。</span>
+                </div>
+            `,
+            4: `
+                <div class="result-item">
+                    <span class="result-emoji">🎯</span>
+                    <span class="result-text">運命の転機：${this.getRandomDate()}にあなたの人生を変える出来事が起こります。</span>
+                </div>
+            `,
+            5: `
+                <div class="result-item">
+                    <span class="result-emoji">🔮</span>
+                    <span class="result-text">完全なる真実：あなたの使命は「${this.getRandomMission()}」です。</span>
+                </div>
+            `
+        };
+        
+        return templates[level] || templates[0];
+    },
+
+    // ロックされたコンテンツの表示
+    generateLockedContent(level) {
+        if (level >= 5) {
+            return `<div class="all-unlocked">✨ 全ての真実が明らかになりました！</div>`;
+        }
+
+        const locked = 5 - level;
+        let content = '';
+        
+        for (let i = 0; i < locked; i++) {
+            content += `
+                <div class="locked-item">
+                    <span class="lock-icon">🔒</span>
+                    <span class="locked-text">重要な情報がロックされています...</span>
+                </div>
+            `;
+        }
+        
+        return content;
+    },
+
+    // 次のオファーを表示
+    showNextOffer(nextLevel) {
+        if (nextLevel >= this.stages.length) return;
+
+        const modal = document.createElement('div');
+        modal.className = 'next-offer-modal';
+        modal.innerHTML = `
+            <div class="offer-modal-content">
+                <div class="offer-header">
+                    <h2>まだ終わりではありません...</h2>
+                    <p>さらに深い真実があなたを待っています</p>
+                </div>
+                
+                ${this.showPricing(nextLevel)}
+                
+                <button class="skip-button" onclick="PaymentPsychology.closeOffer()">
+                    今は結構です（本当に？）
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        setTimeout(() => modal.classList.add('show'), 100);
+        
+        // タイマー開始
+        this.startTimer(nextLevel);
+    },
+
+    // サブスクリプションオファー
+    showSubscriptionOffer() {
+        const modal = document.createElement('div');
+        modal.className = 'subscription-modal';
+        modal.innerHTML = `
+            <div class="subscription-content">
+                <div class="subscription-header">
+                    <h1>🎊 おめでとうございます！</h1>
+                    <p>あなたは真実を知る勇気を持った特別な人です</p>
+                </div>
+                
+                <div class="subscription-offer">
+                    <h2>永続的な導きを手に入れませんか？</h2>
+                    
+                    <div class="subscription-benefits">
+                        <div class="benefit-item">✅ 毎日の詳細診断</div>
+                        <div class="benefit-item">✅ 24時間サポート</div>
+                        <div class="benefit-item">✅ 限定コンテンツ</div>
+                        <div class="benefit-item">✅ VIPコミュニティ</div>
+                    </div>
+                    
+                    <div class="subscription-pricing">
+                        <div class="sub-price">
+                            <span class="sub-amount">月額 ¥980</span>
+                            <span class="sub-note">（初月無料）</span>
+                        </div>
+                        <button class="subscribe-button" onclick="PaymentPsychology.processSubscription()">
+                            無料で始める
+                        </button>
+                    </div>
+                    
+                    <div class="subscription-warning">
+                        ⚠️ このオファーは二度と表示されません
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        setTimeout(() => modal.classList.add('show'), 100);
+    },
+
+    // タイマー機能
+    startTimer(level) {
+        const stage = this.stages[level];
+        if (!stage.timer) return;
+
+        let remaining = stage.timer;
+        const timerElement = document.querySelector(`[data-timer="${stage.timer}"] .timer-display`);
+        
+        const interval = setInterval(() => {
+            const minutes = Math.floor(remaining / 60);
+            const seconds = remaining % 60;
+            
+            if (timerElement) {
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+            
+            remaining--;
+            
+            if (remaining < 0) {
+                clearInterval(interval);
+                if (timerElement) {
+                    timerElement.textContent = '終了';
+                    timerElement.style.color = '#ff6b6b';
+                }
+            }
+        }, 1000);
+    },
+
+    // ランダム要素生成（リアリティを演出）
+    getRandomDay() {
+        const days = ['月曜日', '水曜日', '金曜日', '土曜日', '日曜日'];
+        return days[Math.floor(Math.random() * days.length)];
+    },
+
+    getRandomAmount() {
+        const amounts = [10000, 30000, 50000, 80000, 100000];
+        return amounts[Math.floor(Math.random() * amounts.length)].toLocaleString();
+    },
+
+    getRandomTalent() {
+        const talents = ['リーダーシップ', 'クリエイティビティ', '共感力', '分析力', '直感力'];
+        return talents[Math.floor(Math.random() * talents.length)];
+    },
+
+    getRandomWarning() {
+        const warnings = ['赤い服を着た人', '北東の方角', '偶数の日', '水辺での決断', '急な誘い'];
+        return warnings[Math.floor(Math.random() * warnings.length)];
+    },
+
+    getRandomDate() {
+        const date = new Date();
+        date.setDate(date.getDate() + Math.floor(Math.random() * 30) + 1);
+        return `${date.getMonth() + 1}月${date.getDate()}日`;
+    },
+
+    getRandomMission() {
+        const missions = ['人々を導く光となること', '真実を伝える使者', '愛を広める存在', '変革をもたらす者'];
+        return missions[Math.floor(Math.random() * missions.length)];
+    },
+
+    // オファーを閉じる
+    closeOffer() {
+        const modal = document.querySelector('.next-offer-modal');
+        if (modal) {
+            modal.classList.remove('show');
+            setTimeout(() => modal.remove(), 300);
+        }
+    },
+
+    // サブスクリプション処理
+    processSubscription() {
+        alert('サブスクリプション登録画面へ（Stripe実装）');
+        // Stripe定期課金の実装
+    }
+};
+
+// ページ読み込み時に初期化
+document.addEventListener('DOMContentLoaded', () => {
+    // 保存されたレベルを復元
+    const savedLevel = localStorage.getItem('paymentLevel');
+    const savedSpent = localStorage.getItem('totalSpent');
+    
+    if (savedLevel) {
+        PaymentPsychology.currentLevel = parseInt(savedLevel);
+    }
+    if (savedSpent) {
+        PaymentPsychology.totalSpent = parseInt(savedSpent);
+    }
+});
+</script>
+
+<!-- 段階的課金用の追加CSS -->
+<style>
+/* 価格カード */
+.pricing-card {
+    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 30px;
+    margin: 20px 0;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.pricing-card.current {
+    border-color: #ffd700;
+    box-shadow: 0 0 30px rgba(255,215,0,0.3);
+}
+
+.pricing-card.completed {
+    opacity: 0.5;
+}
+
+.recommended-badge {
+    position: absolute;
+    top: -15px;
+    right: 20px;
+    background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    animation: pulse 2s infinite;
+}
+
+.popular-badge {
+    position: absolute;
+    top: -15px;
+    left: 20px;
+    background: linear-gradient(45deg, #f093fb, #f5576c);
+    color: white;
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.pricing-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ffd700;
+}
+
+.pricing-description {
+    opacity: 0.9;
+    margin-bottom: 20px;
+}
+
+.pricing-amount {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.original-price {
+    text-decoration: line-through;
+    opacity: 0.5;
+    font-size: 18px;
+}
+
+.discount-badge {
+    background: #ff6b6b;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+.final-price {
+    font-size: 48px;
+    font-weight: bold;
+    color: #ffd700;
+    margin: 20px 0;
+    display: flex;
+    align-items: baseline;
+}
+
+.currency {
+    font-size: 24px;
+    margin-right: 5px;
+}
+
+.pricing-bait {
+    background: rgba(255,215,0,0.1);
+    border-left: 3px solid #ffd700;
+    padding: 10px 15px;
+    margin: 20px 0;
+    font-style: italic;
+}
+
+.countdown-timer {
+    background: rgba(255,107,107,0.2);
+    border: 1px solid #ff6b6b;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 15px 0;
+    text-align: center;
+}
+
+.timer-label {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+    margin-bottom: 5px;
+}
+
+.timer-display {
+    font-size: 24px;
+    font-weight: bold;
+    color: #ff6b6b;
+}
+
+.purchase-button {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #333;
+    border: none;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(255,215,0,0.3);
+}
+
+.purchase-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(255,215,0,0.4);
+}
+
+.sunk-cost-reminder {
+    background: rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+    text-align: center;
+    font-size: 14px;
+    color: #ffd700;
+}
+
+/* 投資トラッカー */
+.investment-tracker {
+    background: linear-gradient(135deg, rgba(103,126,234,0.2) 0%, rgba(118,75,162,0.2) 100%);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 30px 0;
+    text-align: center;
+}
+
+.investment-label {
+    font-size: 14px;
+    opacity: 0.8;
+    margin-bottom: 10px;
+}
+
+.investment-amount {
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffd700;
+    margin: 10px 0;
+}
+
+.investment-progress {
+    background: rgba(255,255,255,0.1);
+    height: 10px;
+    border-radius: 5px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #ffd700, #ffed4e);
+    transition: width 0.5s ease;
+}
+
+.investment-message {
+    font-style: italic;
+    opacity: 0.9;
+    margin-top: 10px;
+}
+
+/* 処理中オーバーレイ */
+.processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100000;
+}
+
+.processing-overlay.show {
+    opacity: 1;
+}
+
+.processing-content {
+    text-align: center;
+    color: white;
+}
+
+.processing-spinner {
+    width: 80px;
+    height: 80px;
+    border: 4px solid rgba(255,255,255,0.2);
+    border-top-color: #ffd700;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    animation: spin 1s linear infinite;
+}
+
+.processing-text {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.processing-subtext {
+    font-size: 14px;
+    opacity: 0.8;
+}
+
+/* 結果表示 */
+.revealed-results {
+    animation: fadeIn 0.5s ease;
+}
+
+.results-title {
+    text-align: center;
+    font-size: 32px;
+    margin: 30px 0;
+    color: #ffd700;
+}
+
+.results-content {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 25px;
+    margin: 20px 0;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.result-emoji {
+    font-size: 32px;
+}
+
+.result-text {
+    flex: 1;
+    line-height: 1.6;
+}
+
+.results-teaser {
+    background: rgba(255,107,107,0.1);
+    border: 2px dashed rgba(255,107,107,0.3);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.locked-content {
+    margin-top: 15px;
+}
+
+.locked-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+    margin: 5px 0;
+    background: rgba(0,0,0,0.2);
+    border-radius: 8px;
+    opacity: 0.7;
+}
+
+.lock-icon {
+    font-size: 20px;
+}
+
+.locked-text {
+    font-style: italic;
+}
+
+.all-unlocked {
+    font-size: 20px;
+    color: #ffd700;
+    padding: 20px;
+}
+
+/* オファーモーダル */
+.next-offer-modal,
+.subscription-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 100001;
+}
+
+.next-offer-modal.show,
+.subscription-modal.show {
+    opacity: 1;
+}
+
+.offer-modal-content,
+.subscription-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    color: white;
+}
+
+.offer-header,
+.subscription-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.offer-header h2,
+.subscription-header h1 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.skip-button {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: rgba(255,255,255,0.7);
+    border-radius: 50px;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.skip-button:hover {
+    background: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/* サブスクリプション */
+.subscription-benefits {
+    background: rgba(255,255,255,0.1);
+    border-radius: 15px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.benefit-item {
+    padding: 10px;
+    font-size: 16px;
+}
+
+.subscription-pricing {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.sub-price {
+    margin-bottom: 20px;
+}
+
+.sub-amount {
+    font-size: 36px;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.sub-note {
+    display: block;
+    font-size: 14px;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.subscribe-button {
+    padding: 20px 60px;
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #333;
+    border: none;
+    border-radius: 50px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(255,215,0,0.3);
+    transition: all 0.3s ease;
+}
+
+.subscribe-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 15px 40px rgba(255,215,0,0.4);
+}
+
+.subscription-warning {
+    background: rgba(255,107,107,0.2);
+    border: 1px solid #ff6b6b;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    margin-top: 20px;
+}
+</style>
