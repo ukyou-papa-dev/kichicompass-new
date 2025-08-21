@@ -4,6 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KichiCompass - あなただけの運命の羅針盤</title>
+    
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XXXXXXXXX');
+      
+      // イベント追跡
+      function trackEvent(action, category) {
+        gtag('event', action, {
+          'event_category': category
+        });
+      }
+    </script>
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -178,6 +195,16 @@
             text-align: center;
             max-width: 400px;
         }
+
+        #email-capture {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px auto;
+            max-width: 500px;
+            text-align: center;
+            border: 2px solid gold;
+        }
     </style>
 </head>
 <body>
@@ -193,6 +220,33 @@
             <div class="visitor-badge" id="visitors">
                 🔴 現在523名が鑑定中
             </div>
+        </div>
+
+        <!-- メール収集フォーム -->
+        <div id="email-capture">
+            <h2 style="color: gold; margin-bottom: 20px;">
+                🎁 毎日の運勢を無料でお届け
+            </h2>
+            <p style="margin-bottom: 20px;">
+                今なら登録者限定で特別な占いコンテンツをプレゼント！
+            </p>
+            <form onsubmit="captureEmail(event)">
+                <input type="email" 
+                       placeholder="メールアドレスを入力" 
+                       required
+                       style="
+                           width: 100%;
+                           padding: 15px;
+                           border-radius: 10px;
+                           border: 2px solid gold;
+                           margin-bottom: 15px;
+                           font-size: 16px;
+                           color: #333;
+                       ">
+                <button type="submit" class="cta-button" style="width:100%;margin:0;">
+                    無料で登録する
+                </button>
+            </form>
         </div>
         
         <div class="fortune-grid" id="fortune-selection">
@@ -224,7 +278,7 @@
             <h2>あなたの情報を入力</h2>
             <input type="text" id="name" placeholder="お名前" required>
             <input type="date" id="birthdate" required>
-            <input type="email" id="email" placeholder="メールアドレス">
+            <input type="email" id="email" placeholder="メールアドレス（任意）">
             <button class="cta-button" onclick="showResult()">
                 運命を見る
             </button>
@@ -353,12 +407,48 @@
         function goToStripe() {
             window.location.href = STRIPE_URL;
         }
+
+        // メール収集
+        function captureEmail(e) {
+            e.preventDefault();
+            const email = e.target[0].value;
+            
+            // LocalStorageに保存
+            let emails = JSON.parse(localStorage.getItem('emails') || '[]');
+            emails.push({
+                email: email,
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('emails', JSON.stringify(emails));
+            
+            // Google Analytics イベント
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'email_capture', {
+                    'event_category': 'engagement'
+                });
+            }
+            
+            alert('登録完了！毎日の運勢をお楽しみに！');
+            e.target[0].value = '';
+            
+            // 登録後は非表示
+            document.getElementById('email-capture').style.display = 'none';
+        }
         
         // 占い開始
         function startFortune(type) {
             document.getElementById('form-section').style.display = 'block';
             document.getElementById('fortune-selection').style.display = 'none';
+            document.getElementById('email-capture').style.display = 'none';
             if(type) localStorage.setItem('fortuneType', type);
+            
+            // Google Analytics イベント
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'fortune_start', {
+                    'event_category': 'engagement',
+                    'event_label': type || 'general'
+                });
+            }
         }
 
         // 占いロジック
@@ -447,6 +537,89 @@
                         </div>
                     </div>
                 `;
+            },
+
+            shichu: function(name, birthdate) {
+                const date = new Date(birthdate);
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                
+                // 簡易的な四柱推命ロジック
+                const tenkan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+                const chishi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+                
+                const yearIndex = (year - 4) % 60;
+                const tenkanIndex = yearIndex % 10;
+                const chishiIndex = yearIndex % 12;
+                
+                return `
+                    <h2>${name}様の四柱推命</h2>
+                    <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:10px;margin:20px 0;">
+                        <h3>🐉 あなたの命式</h3>
+                        <p>年柱：${tenkan[tenkanIndex]}${chishi[chishiIndex]}</p>
+                        <p>${name}様は強い運命の持ち主です。</p>
+                        <p>特に金運と仕事運において素晴らしい才能が...</p>
+                        <p>今年は大きな転機の年となるでしょう。</p>
+                    </div>
+                    <div style="filter:blur(3px);background:rgba(255,255,255,0.05);padding:20px;border-radius:10px;position:relative;">
+                        <p>しかし、${name}様の命式には特別な暗示が...</p>
+                        <p>注意すべき月は...</p>
+                        <p>相性の良い相手の特徴...</p>
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;text-align:center;">
+                            <p style="color:gold;">💫 完全な命式解析 💫</p>
+                            <a href="${STRIPE_URL}" class="cta-button">
+                                詳細を見る
+                            </a>
+                        </div>
+                    </div>
+                `;
+            },
+
+            numerology: function(name, birthdate) {
+                const date = new Date(birthdate);
+                const year = date.getFullYear();
+                const month = date.getMonth() + 1;
+                const day = date.getDate();
+                
+                // ライフパス数の計算
+                let lifePathNumber = (year + month + day).toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                while (lifePathNumber > 9) {
+                    lifePathNumber = lifePathNumber.toString().split('').reduce((a, b) => parseInt(a) + parseInt(b), 0);
+                }
+                
+                const meanings = {
+                    1: 'リーダーシップと独立',
+                    2: '協調と調和',
+                    3: '創造性と表現',
+                    4: '安定と実践',
+                    5: '自由と冒険',
+                    6: '愛と責任',
+                    7: '探求と内省',
+                    8: '成功と物質',
+                    9: '奉仕と完成'
+                };
+                
+                return `
+                    <h2>${name}様の数秘術</h2>
+                    <div style="background:rgba(255,255,255,0.1);padding:20px;border-radius:10px;margin:20px 0;">
+                        <h3>🔢 ライフパス数：${lifePathNumber}</h3>
+                        <p>意味：${meanings[lifePathNumber]}</p>
+                        <p>${name}様の使命は「${meanings[lifePathNumber]}」です。</p>
+                        <p>この数字を持つ人は特別な才能に恵まれ...</p>
+                        <p>今月のラッキーナンバーは${(lifePathNumber + month) % 10}です。</p>
+                    </div>
+                    <div style="filter:blur(3px);padding:20px;position:relative;">
+                        <p>${name}様と相性の良い人の特徴...</p>
+                        <p>避けるべき数字と時期...</p>
+                        <p>金運を上げる具体的な方法...</p>
+                        <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.95);padding:20px;border-radius:10px;">
+                            <a href="${STRIPE_URL}" class="cta-button">
+                                完全版を見る
+                            </a>
+                        </div>
+                    </div>
+                `;
             }
         };
         
@@ -458,10 +631,21 @@
             
             let resultHTML = '';
             
-            if (fortuneType === 'tarot') {
-                resultHTML = fortuneTelling.tarot(name);
-            } else {
-                resultHTML = fortuneTelling.astrology(name, birthdate || '2000-01-01');
+            switch(fortuneType) {
+                case 'astrology':
+                    resultHTML = fortuneTelling.astrology(name, birthdate || '2000-01-01');
+                    break;
+                case 'tarot':
+                    resultHTML = fortuneTelling.tarot(name);
+                    break;
+                case 'shichu':
+                    resultHTML = fortuneTelling.shichu(name, birthdate || '2000-01-01');
+                    break;
+                case 'numerology':
+                    resultHTML = fortuneTelling.numerology(name, birthdate || '2000-01-01');
+                    break;
+                default:
+                    resultHTML = fortuneTelling.astrology(name, birthdate || '2000-01-01');
             }
             
             document.getElementById('result-section').style.display = 'block';
@@ -481,6 +665,14 @@
                 date: new Date().toISOString()
             });
             localStorage.setItem('fortuneResults', JSON.stringify(results));
+
+            // Google Analytics イベント
+            if (typeof gtag !== 'undefined') {
+                gtag('event', 'fortune_complete', {
+                    'event_category': 'engagement',
+                    'event_label': fortuneType
+                });
+            }
         }
     </script>
 </body>
