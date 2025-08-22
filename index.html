@@ -377,6 +377,84 @@
             letter-spacing: 1px;
         }
 
+        /* 占術選択グリッド */
+        .fortune-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .fortune-option {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            border: 2px solid transparent;
+            backdrop-filter: blur(10px);
+        }
+
+        .fortune-option:hover {
+            transform: translateY(-5px) scale(1.05);
+            background: rgba(255,255,255,0.2);
+            border-color: #ffd700;
+            box-shadow: 0 10px 30px rgba(255,215,0,0.3);
+        }
+
+        .fortune-option.special {
+            background: linear-gradient(135deg, rgba(255,215,0,0.2), rgba(255,165,0,0.2));
+            border-color: #ffd700;
+        }
+
+        .fortune-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+            animation: icon-float 3s ease-in-out infinite;
+        }
+
+        @keyframes icon-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        .fortune-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .fortune-description {
+            font-size: 12px;
+            opacity: 0.9;
+            line-height: 1.4;
+        }
+
+        .fortune-badge {
+            position: absolute;
+            top: -10px;
+            right: 10px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .special-badge {
+            background: linear-gradient(45deg, #ffd700, #ffa500);
+            animation: badge-pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
         /* ローディング */
         .loading-container {
             display: none;
@@ -513,6 +591,57 @@
         .result-content {
             line-height: 1.8;
             font-size: 16px;
+        }
+
+        /* 占術結果スタイル */
+        .fortune-detail {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .fortune-detail h4 {
+            color: #ffd700;
+            margin: 10px 0 5px;
+            font-size: 16px;
+        }
+
+        .tarot-spread {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .tarot-position {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        .card-name {
+            color: #ffd700;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .card-meaning {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .numerology-result,
+        .animal-result,
+        .shichu-result {
+            padding: 15px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .comprehensive-result .result-card {
+            margin: 30px 0;
         }
 
         /* ぼかし効果 */
@@ -732,23 +861,6 @@
             transform: scale(1.15) rotate(15deg);
         }
 
-        /* レスポンシブ */
-        @media (max-width: 480px) {
-            .title-text {
-                font-size: 24px;
-            }
-            
-            .container {
-                padding: 15px;
-            }
-            
-            .notification-popup {
-                left: 10px;
-                right: 10px;
-                max-width: none;
-            }
-        }
-
         /* 特別オファーモーダル */
         .special-offer-modal {
             position: fixed;
@@ -866,6 +978,27 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 30px rgba(255,107,107,0.4);
         }
+
+        /* レスポンシブ */
+        @media (max-width: 480px) {
+            .title-text {
+                font-size: 24px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .notification-popup {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+
+            .tarot-spread {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -941,6 +1074,58 @@
             </div>
         </div>
 
+        <!-- 占術選択画面 -->
+        <div class="step" id="fortuneSelection">
+            <div class="main-title">
+                <h2 class="title-text">✨ <span id="userName2"></span>様の占術を選択 ✨</h2>
+                <p class="subtitle">あなたに最適な占術で運命を解き明かします</p>
+            </div>
+
+            <div class="fortune-grid">
+                <div class="fortune-option" onclick="selectFortune('astrology')">
+                    <div class="fortune-icon">⭐</div>
+                    <h3 class="fortune-name">西洋占星術</h3>
+                    <p class="fortune-description">12星座と惑星の配置から運命を読み解く</p>
+                    <div class="fortune-badge">人気No.1</div>
+                </div>
+
+                <div class="fortune-option" onclick="selectFortune('tarot')">
+                    <div class="fortune-icon">🎴</div>
+                    <h3 class="fortune-name">タロット占い</h3>
+                    <p class="fortune-description">78枚のカードが示す深層心理と未来</p>
+                    <div class="fortune-badge">的中率98%</div>
+                </div>
+
+                <div class="fortune-option" onclick="selectFortune('numerology')">
+                    <div class="fortune-icon">🔢</div>
+                    <h3 class="fortune-name">数秘術</h3>
+                    <p class="fortune-description">生年月日から導く運命の数字</p>
+                    <div class="fortune-badge">恋愛特化</div>
+                </div>
+
+                <div class="fortune-option" onclick="selectFortune('animal')">
+                    <div class="fortune-icon">🐾</div>
+                    <h3 class="fortune-name">動物占い</h3>
+                    <p class="fortune-description">12の動物キャラで性格と相性を診断</p>
+                    <div class="fortune-badge">相性診断</div>
+                </div>
+
+                <div class="fortune-option" onclick="selectFortune('shichu')">
+                    <div class="fortune-icon">🐉</div>
+                    <h3 class="fortune-name">四柱推命</h3>
+                    <p class="fortune-description">東洋最高峰の的中率を誇る運命学</p>
+                    <div class="fortune-badge">プロ推奨</div>
+                </div>
+
+                <div class="fortune-option special" onclick="selectFortune('all')">
+                    <div class="fortune-icon">👑</div>
+                    <h3 class="fortune-name">総合鑑定</h3>
+                    <p class="fortune-description">全ての占術を組み合わせた完全診断</p>
+                    <div class="fortune-badge special-badge">限定</div>
+                </div>
+            </div>
+        </div>
+
         <!-- ローディング -->
         <div class="loading-container" id="loading">
             <div class="loading-spinner">
@@ -1013,6 +1198,9 @@
                 </div>
                 <div class="result-content" id="criticalMessage"></div>
             </div>
+
+            <!-- 占術結果表示エリア -->
+            <div id="fortuneResultArea"></div>
 
             <div class="result-card">
                 <div class="result-header">
@@ -1090,8 +1278,342 @@
         let userData = {
             name: '',
             birthDate: '',
+            fortuneType: '',
             startTime: new Date(),
             step: 1
+        };
+
+        // 占術データベース
+        const FortuneDatabase = {
+            astrology: {
+                name: '西洋占星術',
+                getZodiac(birthDate) {
+                    const date = new Date(birthDate);
+                    const month = date.getMonth() + 1;
+                    const day = date.getDate();
+                    
+                    if ((month == 3 && day >= 21) || (month == 4 && day <= 19)) return '牡羊座';
+                    if ((month == 4 && day >= 20) || (month == 5 && day <= 20)) return '牡牛座';
+                    if ((month == 5 && day >= 21) || (month == 6 && day <= 20)) return '双子座';
+                    if ((month == 6 && day >= 21) || (month == 7 && day <= 22)) return '蟹座';
+                    if ((month == 7 && day >= 23) || (month == 8 && day <= 22)) return '獅子座';
+                    if ((month == 8 && day >= 23) || (month == 9 && day <= 22)) return '乙女座';
+                    if ((month == 9 && day >= 23) || (month == 10 && day <= 22)) return '天秤座';
+                    if ((month == 10 && day >= 23) || (month == 11 && day <= 21)) return '蠍座';
+                    if ((month == 11 && day >= 22) || (month == 12 && day <= 21)) return '射手座';
+                    if ((month == 12 && day >= 22) || (month == 1 && day <= 19)) return '山羊座';
+                    if ((month == 1 && day >= 20) || (month == 2 && day <= 18)) return '水瓶座';
+                    return '魚座';
+                },
+                generateResult(name, birthDate) {
+                    const zodiac = this.getZodiac(birthDate);
+                    const zodiacTraits = {
+                        '牡羊座': { element: '火', ruler: '火星', trait: '情熱的でリーダーシップ' },
+                        '牡牛座': { element: '地', ruler: '金星', trait: '堅実で美的センス' },
+                        '双子座': { element: '風', ruler: '水星', trait: '知的でコミュニケーション能力' },
+                        '蟹座': { element: '水', ruler: '月', trait: '感受性豊かで家族思い' },
+                        '獅子座': { element: '火', ruler: '太陽', trait: 'カリスマ性と創造力' },
+                        '乙女座': { element: '地', ruler: '水星', trait: '分析力と完璧主義' },
+                        '天秤座': { element: '風', ruler: '金星', trait: 'バランス感覚と社交性' },
+                        '蠍座': { element: '水', ruler: '冥王星', trait: '洞察力と情熱' },
+                        '射手座': { element: '火', ruler: '木星', trait: '冒険心と楽観性' },
+                        '山羊座': { element: '地', ruler: '土星', trait: '野心と忍耐力' },
+                        '水瓶座': { element: '風', ruler: '天王星', trait: '独創性と博愛精神' },
+                        '魚座': { element: '水', ruler: '海王星', trait: '直感力と芸術性' }
+                    };
+                    
+                    const trait = zodiacTraits[zodiac];
+                    
+                    return `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <span class="result-icon">🌟</span>
+                                <span class="result-title">${name}様は${zodiac}です</span>
+                            </div>
+                            <div class="result-content">
+                                <p>支配星：${trait.ruler} | エレメント：${trait.element}</p>
+                                <p>基本性格：${trait.trait}に優れています。</p>
+                                <div class="fortune-detail">
+                                    <h4>💕 恋愛運</h4>
+                                    <p>${zodiac}の${name}様は、今月特に魅力が高まっています。${trait.element}のエレメントが強まり、異性を惹きつける力が最高潮に。</p>
+                                    <h4>💰 金運</h4>
+                                    <p>${trait.ruler}の影響で、臨時収入の可能性が。特に15日前後は要チェック。</p>
+                                    <h4>🍀 ラッキーアイテム</h4>
+                                    <p>${trait.element}に関連するアイテムを身につけると運気上昇！</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            
+            tarot: {
+                name: 'タロット占い',
+                cards: [
+                    { name: '愚者', meaning: '新しい始まり、無限の可能性' },
+                    { name: '魔術師', meaning: '創造力、実現力' },
+                    { name: '女教皇', meaning: '直感、内なる声' },
+                    { name: '女帝', meaning: '豊穣、母性' },
+                    { name: '皇帝', meaning: '権威、安定' },
+                    { name: '教皇', meaning: '伝統、精神性' },
+                    { name: '恋人', meaning: '選択、調和' },
+                    { name: '戦車', meaning: '勝利、前進' },
+                    { name: '力', meaning: '内なる強さ、勇気' },
+                    { name: '隠者', meaning: '内省、真実の探求' },
+                    { name: '運命の輪', meaning: '転機、チャンス' },
+                    { name: '正義', meaning: 'バランス、公正' },
+                    { name: '吊るされた男', meaning: '試練、新たな視点' },
+                    { name: '死神', meaning: '変化、再生' },
+                    { name: '節制', meaning: '調和、忍耐' },
+                    { name: '悪魔', meaning: '執着、誘惑' },
+                    { name: '塔', meaning: '突然の変化、覚醒' },
+                    { name: '星', meaning: '希望、インスピレーション' },
+                    { name: '月', meaning: '不安、幻想' },
+                    { name: '太陽', meaning: '成功、喜び' },
+                    { name: '審判', meaning: '復活、新たな始まり' },
+                    { name: '世界', meaning: '完成、達成' }
+                ],
+                generateResult(name) {
+                    const past = this.cards[Math.floor(Math.random() * this.cards.length)];
+                    const present = this.cards[Math.floor(Math.random() * this.cards.length)];
+                    const future = this.cards[Math.floor(Math.random() * this.cards.length)];
+                    
+                    return `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <span class="result-icon">🎴</span>
+                                <span class="result-title">${name}様のタロットリーディング</span>
+                            </div>
+                            <div class="result-content">
+                                <div class="tarot-spread">
+                                    <div class="tarot-position">
+                                        <h4>過去</h4>
+                                        <p class="card-name">${past.name}</p>
+                                        <p class="card-meaning">${past.meaning}</p>
+                                    </div>
+                                    <div class="tarot-position">
+                                        <h4>現在</h4>
+                                        <p class="card-name">${present.name}</p>
+                                        <p class="card-meaning">${present.meaning}</p>
+                                    </div>
+                                    <div class="tarot-position">
+                                        <h4>未来</h4>
+                                        <p class="card-name">${future.name}</p>
+                                        <p class="card-meaning">${future.meaning}</p>
+                                    </div>
+                                </div>
+                                <p style="margin-top: 20px;">
+                                    ${name}様の運命は「${past.name}」から「${present.name}」を経て「${future.name}」へと向かっています。
+                                    特に${future.name}のカードは、近い将来の重要な転機を示唆しています。
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            
+            numerology: {
+                name: '数秘術',
+                calculateLifePath(birthDate) {
+                    const date = birthDate.replace(/-/g, '');
+                    let sum = date.split('').reduce((a, b) => a + parseInt(b), 0);
+                    while (sum > 9 && sum !== 11 && sum !== 22 && sum !== 33) {
+                        sum = sum.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+                    }
+                    return sum;
+                },
+                generateResult(name, birthDate) {
+                    const lifePathNumber = this.calculateLifePath(birthDate);
+                    const meanings = {
+                        1: { trait: 'リーダーシップと独立心', color: '赤', gem: 'ルビー' },
+                        2: { trait: '協調性と感受性', color: 'オレンジ', gem: 'ムーンストーン' },
+                        3: { trait: '創造性と表現力', color: '黄', gem: 'トパーズ' },
+                        4: { trait: '安定と実践力', color: '緑', gem: 'エメラルド' },
+                        5: { trait: '自由と冒険心', color: '青', gem: 'サファイア' },
+                        6: { trait: '愛と責任感', color: 'インディゴ', gem: 'ラピスラズリ' },
+                        7: { trait: '探求心と内省', color: '紫', gem: 'アメジスト' },
+                        8: { trait: '成功と物質的達成', color: 'ピンク', gem: 'ローズクォーツ' },
+                        9: { trait: '博愛と奉仕精神', color: '金', gem: 'シトリン' },
+                        11: { trait: 'スピリチュアルな洞察力', color: '銀', gem: 'クリスタル' },
+                        22: { trait: 'マスタービルダー', color: '銅', gem: 'タイガーアイ' },
+                        33: { trait: 'マスターティーチャー', color: '白', gem: 'ダイヤモンド' }
+                    };
+                    
+                    const meaning = meanings[lifePathNumber] || meanings[1];
+                    
+                    return `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <span class="result-icon">🔢</span>
+                                <span class="result-title">${name}様のライフパスナンバー：${lifePathNumber}</span>
+                            </div>
+                            <div class="result-content">
+                                <div class="numerology-result">
+                                    <p>基本性質：${meaning.trait}</p>
+                                    <p>ラッキーカラー：${meaning.color}</p>
+                                    <p>パワーストーン：${meaning.gem}</p>
+                                    <div class="fortune-detail">
+                                        <h4>📊 ${name}様の数秘術詳細</h4>
+                                        <p>ライフパスナンバー${lifePathNumber}を持つ${name}様は、${meaning.trait}に優れた人物です。</p>
+                                        <p>今月は特に数字の${lifePathNumber}に関連する日（${lifePathNumber}日、${lifePathNumber + 9}日、${lifePathNumber + 18}日）が幸運日となります。</p>
+                                        <p>相性の良い数字：${(lifePathNumber + 3) % 9 || 9}、${(lifePathNumber + 6) % 9 || 9}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            },
+            
+            animal: {
+                name: '動物占い',
+                getAnimal(birthDate) {
+                    const date = new Date(birthDate);
+                    const year = date.getFullYear();
+                    const animals = [
+                        'こじか', 'たぬき', 'さる', 'チータ', 'くろひょう',
+                        'ライオン', 'トラ', 'ひつじ', 'ペガサス', 'ゾウ', 'オオカミ', 'コアラ'
+                    ];
+                    const index = (year + date.getMonth() + date.getDate()) % 12;
+                    return animals[index];
+                },
+                generateResult(name, birthDate) {
+                    const animal = this.getAnimal(birthDate);
+                    const traits = {
+                        'こじか': { type: '愛されキャラ', love: '素直で可愛らしい', work: 'サポート役' },
+                        'たぬき': { type: '人気者', love: '愛嬌がある', work: 'ムードメーカー' },
+                        'さる': { type: 'お調子者', love: '楽しい恋愛', work: 'アイデアマン' },
+                        'チータ': { type: 'スピード重視', love: '情熱的', work: '即断即決' },
+                        'くろひょう': { type: 'クール', love: 'ミステリアス', work: '戦略家' },
+                        'ライオン': { type: 'リーダー', love: '守ってくれる', work: '統率力' },
+                        'トラ': { type: '一匹狼', love: '一途', work: '職人気質' },
+                        'ひつじ': { type: '平和主義', love: '優しい', work: '協調性' },
+                        'ペガサス': { type: '自由人', love: '束縛嫌い', work: 'クリエイティブ' },
+                        'ゾウ': { type: '努力家', love: '誠実', work: '堅実' },
+                        'オオカミ': { type: '個性的', love: '深い愛情', work: '独創的' },
+                        'コアラ': { type: 'マイペース', love: 'のんびり', work: '独自路線' }
+                    };
+                    
+                    const trait = traits[animal] || traits['こじか'];
+                    
+                    return `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <span class="result-icon">🐾</span>
+                                <span class="result-title">${name}様は「${animal}」タイプです</span>
+                            </div>
+                            <div class="result-content">
+                                <div class="animal-result">
+                                    <p>基本性格：${trait.type}</p>
+                                    <div class="fortune-detail">
+                                        <h4>💕 恋愛傾向</h4>
+                                        <p>${trait.love}な恋愛をする傾向があります。</p>
+                                        <h4>💼 仕事運</h4>
+                                        <p>${trait.work}として活躍できるでしょう。</p>
+                                        <h4>🤝 相性の良い動物</h4>
+                                        <p>特に相性が良いのは${this.getCompatibleAnimal(animal)}タイプの人です。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                },
+                getCompatibleAnimal(animal) {
+                    const compatibility = {
+                        'こじか': 'ライオン',
+                        'たぬき': 'ひつじ',
+                        'さる': 'チータ',
+                        'チータ': 'さる',
+                        'くろひょう': 'ゾウ',
+                        'ライオン': 'こじか',
+                        'トラ': 'ペガサス',
+                        'ひつじ': 'たぬき',
+                        'ペガサス': 'トラ',
+                        'ゾウ': 'くろひょう',
+                        'オオカミ': 'コアラ',
+                        'コアラ': 'オオカミ'
+                    };
+                    return compatibility[animal] || 'ライオン';
+                }
+            },
+            
+            shichu: {
+                name: '四柱推命',
+                getTenkan(year) {
+                    const tenkan = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
+                    return tenkan[(year - 4) % 10];
+                },
+                getChishi(year) {
+                    const chishi = ['子', '丑', '寅', '卯', '辰', '巳', '午', '未', '申', '酉', '戌', '亥'];
+                    return chishi[(year - 4) % 12];
+                },
+                generateResult(name, birthDate) {
+                    const date = new Date(birthDate);
+                    const year = date.getFullYear();
+                    const tenkan = this.getTenkan(year);
+                    const chishi = this.getChishi(year);
+                    
+                    const elements = {
+                        '甲': '木', '乙': '木', '丙': '火', '丁': '火',
+                        '戊': '土', '己': '土', '庚': '金', '辛': '金',
+                        '壬': '水', '癸': '水'
+                    };
+                    
+                    const element = elements[tenkan];
+                    
+                    return `
+                        <div class="result-card">
+                            <div class="result-header">
+                                <span class="result-icon">🐉</span>
+                                <span class="result-title">${name}様の四柱推命</span>
+                            </div>
+                            <div class="result-content">
+                                <div class="shichu-result">
+                                    <p>年柱：${tenkan}${chishi}（${element}の性質）</p>
+                                    <div class="fortune-detail">
+                                        <h4>🌟 ${name}様の宿命</h4>
+                                        <p>${element}の性質を持つ${name}様は、${this.getElementTrait(element)}という特性があります。</p>
+                                        <h4>📅 今年の運勢</h4>
+                                        <p>${tenkan}${chishi}年生まれの${name}様にとって、今年は${this.getYearlyFortune(element)}の年となります。</p>
+                                        <h4>💎 開運方法</h4>
+                                        <p>${element}の気を高めるには、${this.getLuckyMethod(element)}が効果的です。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                },
+                getElementTrait(element) {
+                    const traits = {
+                        '木': '成長力と柔軟性',
+                        '火': '情熱と行動力',
+                        '土': '安定と信頼',
+                        '金': '決断力と正義感',
+                        '水': '知恵と適応力'
+                    };
+                    return traits[element] || '特別な才能';
+                },
+                getYearlyFortune(element) {
+                    const fortunes = {
+                        '木': '新しいことを始めるのに最適',
+                        '火': '積極的な行動が吉',
+                        '土': '堅実な努力が実を結ぶ',
+                        '金': '決断と実行の',
+                        '水': '流れに身を任せると良い'
+                    };
+                    return fortunes[element] || '大きな転機';
+                },
+                getLuckyMethod(element) {
+                    const methods = {
+                        '木': '観葉植物を育てる、緑の多い場所へ行く',
+                        '火': '太陽の光を浴びる、赤い物を身につける',
+                        '土': '陶芸や園芸、黄色い物を取り入れる',
+                        '金': '金属製のアクセサリー、白い物を選ぶ',
+                        '水': '水辺で過ごす、青や黒を基調にする'
+                    };
+                    return methods[element] || '瞑想と深呼吸';
+                }
+            }
         };
 
         // カウントダウンタイマー
@@ -1169,16 +1691,32 @@
             userData.name = name;
             localStorage.setItem('userData', JSON.stringify(userData));
             
+            // 占術選択画面へ
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('fortuneSelection').classList.add('active');
+            document.getElementById('userName2').textContent = name;
+        }
+
+        // 占術選択処理
+        function selectFortune(type) {
+            userData.fortuneType = type;
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            if (type === 'all') {
+                showNotification('👑 特別', '総合鑑定を準備中...');
+            }
+            
+            document.getElementById('fortuneSelection').classList.remove('active');
             showLoading();
             setTimeout(() => {
                 hideLoading();
-                showStep2(name);
+                showStep2(userData.name);
             }, 3000);
         }
 
         // ローディング表示
         function showLoading() {
-            document.querySelector('.step.active').classList.remove('active');
+            document.querySelector('.step.active')?.classList.remove('active');
             document.getElementById('loading').classList.add('active');
             
             const messages = [
@@ -1230,7 +1768,6 @@
             document.getElementById('lovePreview').textContent = 
                 loveMessages[Math.floor(Math.random() * loveMessages.length)];
             
-            // 30秒後に通知
             setTimeout(() => {
                 showNotification('⚠️ 重要', '明日までに行動しないと運気が下降します');
             }, 30000);
@@ -1255,6 +1792,38 @@
             }, 3000);
         }
 
+        // 占術結果生成
+        function generateFortuneResult() {
+            const name = userData.name;
+            const birthDate = userData.birthDate;
+            const type = userData.fortuneType || 'astrology';
+            
+            let result = '';
+            
+            if (type === 'all') {
+                result = `
+                    <div class="comprehensive-result">
+                        ${FortuneDatabase.astrology.generateResult(name, birthDate)}
+                        ${FortuneDatabase.tarot.generateResult(name)}
+                        ${FortuneDatabase.numerology.generateResult(name, birthDate)}
+                        ${FortuneDatabase.animal.generateResult(name, birthDate)}
+                        ${FortuneDatabase.shichu.generateResult(name, birthDate)}
+                    </div>
+                `;
+            } else {
+                const fortune = FortuneDatabase[type];
+                if (fortune) {
+                    if (type === 'tarot') {
+                        result = fortune.generateResult(name);
+                    } else {
+                        result = fortune.generateResult(name, birthDate);
+                    }
+                }
+            }
+            
+            return result;
+        }
+
         // ステップ3表示
         function showStep3() {
             document.getElementById('step3').classList.add('active');
@@ -1269,14 +1838,16 @@
             document.getElementById('criticalMessage').textContent = 
                 criticalMessages[Math.floor(Math.random() * criticalMessages.length)];
             
-            // 詳細な占い結果
+            // 占術結果を表示
+            const fortuneResult = generateFortuneResult();
+            document.getElementById('fortuneResultArea').innerHTML = fortuneResult;
+            
             document.getElementById('loveFortune').textContent = 
                 `${userData.name}様の恋愛運は今、特別な転機を迎えています。特に今月の15日前後は重要な出会いの可能性が高まっています。`;
             
             document.getElementById('moneyFortune').textContent = 
                 `金運が急上昇中！臨時収入の暗示があります。宝くじや懸賞での当選運も高まっています。`;
             
-            // 60秒後に特別オファー
             setTimeout(() => {
                 showSpecialOffer();
             }, 60000);
@@ -1288,7 +1859,6 @@
             userData.conversionTime = new Date();
             localStorage.setItem('userData', JSON.stringify(userData));
             
-            // Stripe決済へ
             window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
         }
 
@@ -1296,7 +1866,6 @@
         function showSpecialOffer() {
             document.getElementById('specialOfferModal').classList.add('show');
             
-            // カウントダウン
             let seconds = 300;
             const interval = setInterval(() => {
                 const mins = Math.floor(seconds / 60);
@@ -1339,7 +1908,6 @@
                 }
             }
             
-            // 初回通知
             setTimeout(() => {
                 showNotification('🎉 歓迎', 'KichiCompassへようこそ！');
             }, 2000);
