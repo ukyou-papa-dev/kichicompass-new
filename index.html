@@ -276,6 +276,210 @@
             font-size: 16px;
             cursor: pointer;
         }
+
+        /* プッシュ通知風 */
+        .push-notification {
+            position: fixed;
+            top: 20px;
+            right: -400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            max-width: 350px;
+            transition: right 0.3s ease;
+            z-index: 10000;
+        }
+
+        .push-notification.show {
+            right: 20px;
+        }
+
+        .notification-icon {
+            font-size: 24px;
+        }
+
+        .notification-text {
+            flex: 1;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* 離脱ポップアップ */
+        .exit-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 99999;
+        }
+
+        .exit-popup.show {
+            opacity: 1;
+        }
+
+        .exit-popup-content {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            text-align: center;
+            color: #333;
+            position: relative;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .exit-popup h2 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-size: 32px;
+        }
+
+        .exit-main-message {
+            font-size: 18px;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        .countdown-large {
+            font-size: 36px;
+            color: #ff6b6b;
+            font-weight: bold;
+            display: block;
+            margin: 10px 0;
+        }
+
+        .exit-warning {
+            background: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px solid #ffc107;
+        }
+
+        .exit-offer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .offer-badge {
+            background: #ffd700;
+            color: #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .offer-price {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-size: 24px;
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        .special-price {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 32px;
+        }
+
+        .exit-cta {
+            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+
+        .exit-cta:hover {
+            transform: scale(1.05);
+        }
+
+        .exit-close {
+            background: transparent;
+            color: #999;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 10px;
+        }
+
+        /* 診断結果の詳細 */
+        .fortune-details {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .fortune-category {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+
+        .fortune-category h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .fortune-locked {
+            filter: blur(5px);
+            position: relative;
+            padding: 20px;
+            user-select: none;
+        }
+
+        .unlock-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            padding: 15px 30px;
+            border-radius: 50px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(255,215,0,0.5);
+        }
     </style>
 </head>
 <body>
@@ -352,16 +556,35 @@
                 <div class="result-title">🔮 <span id="finalName"></span>様だけへの特別なメッセージ</div>
                 <div class="result-text" id="criticalMessage"></div>
             </div>
-            
-            <div class="preview-result">
-                <div class="blur-text" style="padding: 20px;">
-                    今後3日以内に、あなたの人生を大きく変える出来事が...
-                    しかし、1つ間違えると取り返しのつかないことに...
-                    <div class="unlock-overlay">🔓 続きを読む（480円）</div>
+
+            <!-- 詳細な占い結果 -->
+            <div class="fortune-details">
+                <div class="fortune-category">
+                    <h3>💕 恋愛運の詳細</h3>
+                    <p id="loveFortune">今月は特別な出会いの予感が...運命の人の特徴は...</p>
+                </div>
+
+                <div class="fortune-category">
+                    <h3>💰 金運の詳細</h3>
+                    <p id="moneyFortune">臨時収入の可能性が！特に15日前後は...</p>
+                </div>
+
+                <div class="fortune-locked">
+                    <div class="fortune-category">
+                        <h3>⚠️ 注意すべき日</h3>
+                        <p>今月の要注意日は...この日だけは絶対に...</p>
+                    </div>
+                    <div class="fortune-category">
+                        <h3>🌟 最高の幸運日</h3>
+                        <p>あなたの運命が大きく動く日は...</p>
+                    </div>
+                    <button class="unlock-button" onclick="processPayment()">
+                        🔓 続きを読む（480円）
+                    </button>
                 </div>
             </div>
             
-            <button class="magic-button" style="background: linear-gradient(45deg, #ffd700, #ffed4e);" onclick="processPayment()">
+            <button class="magic-button" style="background: linear-gradient(45deg, #ffd700, #ffed4e); margin-top: 30px;" onclick="processPayment()">
                 今すぐ全てを知る（特別価格480円）
             </button>
             
@@ -464,6 +687,11 @@
             
             // カウントダウン開始
             startCountdown();
+            
+            // 30秒後に不安メッセージ
+            setTimeout(() => {
+                showNotification('重要：明日までに行動しないと運気が...', 'warning');
+            }, 30000);
         }
         
         // カウントダウンタイマー
@@ -472,16 +700,21 @@
             const timer = setInterval(() => {
                 const mins = Math.floor(seconds / 60);
                 const secs = seconds % 60;
-                document.getElementById('timer').textContent = 
-                    `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                const timerElement = document.getElementById('timer');
+                if (timerElement) {
+                    timerElement.textContent = 
+                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
                 
                 seconds--;
                 
                 if (seconds < 0) {
                     clearInterval(timer);
-                    document.getElementById('timer').textContent = '00:00';
-                    document.getElementById('countdown').innerHTML = 
-                        '<span style="color: #ff6b6b;">⚠️ 時間切れ！特別オファーが終了しました</span>';
+                    const countdownElement = document.getElementById('countdown');
+                    if (countdownElement) {
+                        countdownElement.innerHTML = 
+                            '<span style="color: #ff6b6b;">⚠️ 時間切れ！特別オファーが終了しました</span>';
+                    }
                 }
             }, 1000);
         }
@@ -521,6 +754,56 @@
             
             document.getElementById('criticalMessage').textContent = 
                 criticalMessages[Math.floor(Math.random() * criticalMessages.length)];
+            
+            // 詳細な占い結果を生成
+            generateDetailedFortune();
+            
+            // 60秒後に期待メッセージ
+            setTimeout(() => {
+                showNotification('実は、あなたのことを想っている人が...', 'hope');
+            }, 60000);
+        }
+        
+        // 詳細な占い結果を生成
+        function generateDetailedFortune() {
+            const loveFortuneTexts = [
+                `${userData.name}様の恋愛運は今、特別な転機を迎えています。特に今月の15日前後は重要な出会いの可能性が...`,
+                `運命の人はすぐ近くにいます。その人の特徴は、優しい笑顔と温かい心を持った...`,
+                `${userData.name}様の魅力が最高潮に達しています。今がアプローチの最高のタイミング...`
+            ];
+            
+            const moneyFortuneTexts = [
+                `金運が急上昇中！特に宝くじや懸賞での当選運が...臨時収入の可能性も...`,
+                `今月は投資のチャンス。ただし、22日だけは絶対に大きな買い物を避けて...`,
+                `${userData.name}様の才能が認められ、収入アップの可能性が...`
+            ];
+            
+            document.getElementById('loveFortune').textContent = 
+                loveFortuneTexts[Math.floor(Math.random() * loveFortuneTexts.length)];
+            
+            document.getElementById('moneyFortune').textContent = 
+                moneyFortuneTexts[Math.floor(Math.random() * moneyFortuneTexts.length)];
+        }
+        
+        // プッシュ通知風メッセージ
+        function showNotification(message, type = 'warning') {
+            const notification = document.createElement('div');
+            notification.className = 'push-notification';
+            notification.innerHTML = `
+                <div class="notification-icon">${type === 'warning' ? '⚠️' : '✨'}</div>
+                <div class="notification-text">${message}</div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
         }
         
         // 決済処理
@@ -531,6 +814,62 @@
             
             // 最初の480円決済へ
             window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
+        }
+        
+        // 離脱防止ポップアップ
+        let exitIntentShown = false;
+        document.addEventListener('mouseleave', (e) => {
+            if (e.clientY <= 0 && !exitIntentShown && userData.step > 1 && !userData.converted) {
+                exitIntentShown = true;
+                showExitPopup();
+            }
+        });
+        
+        function showExitPopup() {
+            const popup = document.createElement('div');
+            popup.className = 'exit-popup';
+            popup.innerHTML = `
+                <div class="exit-popup-content">
+                    <h2>😱 ちょっと待って！</h2>
+                    <p class="exit-main-message">
+                        ${userData.name}様の運命の転機まで<br>
+                        <span class="countdown-large">あと12時間</span>
+                    </p>
+                    <div class="exit-warning">
+                        ⚠️ 今離れると、この特別な診断結果は二度と見られません
+                    </div>
+                    <div class="exit-offer">
+                        <div class="offer-badge">最後のチャンス</div>
+                        <div class="offer-price">
+                            <span class="original-price">通常4,800円</span>
+                            <span class="arrow">→</span>
+                            <span class="special-price">今だけ480円</span>
+                        </div>
+                    </div>
+                    <button class="exit-cta" onclick="acceptExitOffer()">
+                        運命を確認する（90%OFF）
+                    </button>
+                    <button class="exit-close" onclick="closeExitPopup()">
+                        本当に諦める
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(popup);
+            setTimeout(() => popup.classList.add('show'), 100);
+        }
+        
+        function acceptExitOffer() {
+            closeExitPopup();
+            processPayment();
+        }
+        
+        function closeExitPopup() {
+            const popup = document.querySelector('.exit-popup');
+            if (popup) {
+                popup.classList.remove('show');
+                setTimeout(() => popup.remove(), 300);
+            }
         }
         
         // ホーム画面追加の誘導
