@@ -10,13 +10,24 @@
     <meta property="og:title" content="【無料】あなたの運命を占います - KichiCompass">
     <meta property="og:description" content="3分で分かる！あなたの運命を無料診断">
     <meta property="og:type" content="website">
+    <meta property="og:image" content="https://kichicompass.com/ogp.jpg">
     
     <!-- PWA対応 -->
+    <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiS2ljaGlDb21wYXNzIiwic2hvcnRfbmFtZSI6IktpY2hpQ29tcGFzcyIsInN0YXJ0X3VybCI6Ii8iLCJkaXNwbGF5Ijoic3RhbmRhbG9uZSIsImJhY2tncm91bmRfY29sb3IiOiIjNjY3ZWVhIiwidGhlbWVfY29sb3IiOiIjNjY3ZWVhIiwiaWNvbnMiOlt7InNyYyI6ImRhdGE6aW1hZ2Uvc3ZnK3htbCw8c3ZnIHhtbG5zPSdodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2Zycgdmlld0JveD0nMCAwIDEwMCAxMDAnPjx0ZXh0IHk9JzAuOWVtJyBmb250LXNpemU9JzkwJz7wn5KOPC90ZXh0Pjwvc3ZnPiIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔮</text></svg>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="KichiCompass">
     <meta name="theme-color" content="#667eea">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XENJ6H8FDN"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-XENJ6H8FDN');
+    </script>
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
@@ -999,6 +1010,34 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* PWA専用スタイル */
+        @media (display-mode: standalone) {
+            body {
+                padding-top: 40px;
+            }
+        }
+
+        /* アニメーション */
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1280,7 +1319,8 @@
             birthDate: '',
             fortuneType: '',
             startTime: new Date(),
-            step: 1
+            step: 1,
+            totalSpent: 0
         };
 
         // 占術データベース
@@ -1616,6 +1656,487 @@
             }
         };
 
+        // =====================================
+        // 🔥 PWAインストール促進システム
+        // =====================================
+        let deferredPrompt;
+        let installCount = 0;
+
+        // PWAインストール可能時
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // 戦略的タイミングで表示
+            if (userData.step === 3 && userData.converted) {
+                // 課金直後が最高のタイミング！
+                setTimeout(() => showInstallBanner('payment'), 3000);
+            } else if (localStorage.getItem('visitCount') >= 3) {
+                // 3回目の訪問
+                showInstallBanner('return');
+            }
+        });
+
+        // インストールバナー表示
+        function showInstallBanner(trigger) {
+            const messages = {
+                payment: {
+                    title: '🎊 特別ボーナス解放！',
+                    text: 'アプリ追加で毎日無料占い＋1,000円分のポイント！',
+                    button: '今すぐ1,000円GET'
+                },
+                return: {
+                    title: '⚡ 重要なお知らせ',
+                    text: 'ホーム画面追加で運命の転機を見逃さない！',
+                    button: '無料で追加'
+                }
+            };
+            
+            const msg = messages[trigger] || messages.return;
+            
+            const banner = document.createElement('div');
+            banner.style.cssText = `
+                position: fixed;
+                bottom: 80px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, #FFD700, #FF6B6B);
+                padding: 20px;
+                border-radius: 20px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+                z-index: 10000;
+                animation: slideUp 0.5s ease-out;
+                max-width: 90%;
+                width: 400px;
+            `;
+            
+            banner.innerHTML = `
+                <div style="color: white; text-align: center;">
+                    <h3 style="margin: 0 0 10px; font-size: 20px;">${msg.title}</h3>
+                    <p style="margin: 0 0 15px; opacity: 0.95;">${msg.text}</p>
+                    <button onclick="installPWA()" style="
+                        background: white;
+                        color: #FF6B6B;
+                        border: none;
+                        padding: 15px 30px;
+                        border-radius: 30px;
+                        font-weight: bold;
+                        font-size: 16px;
+                        cursor: pointer;
+                        width: 100%;
+                    ">${msg.button}</button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: transparent;
+                        border: 1px solid white;
+                        color: white;
+                        padding: 10px;
+                        margin-top: 10px;
+                        border-radius: 20px;
+                        cursor: pointer;
+                        width: 100%;
+                    ">後で</button>
+                </div>
+            `;
+            
+            document.body.appendChild(banner);
+        }
+
+        // インストール実行
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const result = await deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    // インストール成功！
+                    localStorage.setItem('pwaInstalled', 'true');
+                    localStorage.setItem('bonusPoints', '1000');
+                    showNotification('🎉 成功！', '1,000円分のポイントを付与しました！');
+                    
+                    // 特別コンテンツ解放
+                    unlockSpecialContent();
+                }
+            } else if (isIOS()) {
+                showIOSGuide();
+            }
+        }
+
+        // iOS向けガイド
+        function showIOSGuide() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.95);
+                z-index: 100000;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; border-radius: 20px; padding: 30px; max-width: 400px; text-align: center;">
+                    <h2 style="color: #FF6B6B; margin-bottom: 20px;">📱 かんたん3ステップ</h2>
+                    <div style="text-align: left; color: #333;">
+                        <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                            <div style="background: #FF6B6B; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">1</div>
+                            <div>画面下の共有ボタン <span style="font-size: 20px;">⬆</span> をタップ</div>
+                        </div>
+                        <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                            <div style="background: #FF6B6B; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">2</div>
+                            <div>「ホーム画面に追加」を選択</div>
+                        </div>
+                        <div style="margin-bottom: 20px; display: flex; align-items: center;">
+                            <div style="background: #FF6B6B; color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 15px;">3</div>
+                            <div>右上の「追加」をタップで完了！</div>
+                        </div>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" style="
+                        background: linear-gradient(45deg, #FFD700, #FF6B6B);
+                        color: white;
+                        border: none;
+                        padding: 15px 40px;
+                        border-radius: 30px;
+                        font-size: 16px;
+                        font-weight: bold;
+                        cursor: pointer;
+                    ">わかりました</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // iOS判定
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        }
+
+        // スタンドアロンモード判定
+        function isInStandaloneMode() {
+            return window.matchMedia('(display-mode: standalone)').matches || 
+                   window.navigator.standalone || 
+                   document.referrer.includes('android-app://');
+        }
+
+        // 特別コンテンツ解放
+        function unlockSpecialContent() {
+            // 限定占いコンテンツを解放
+            const specialContent = document.createElement('div');
+            specialContent.className = 'result-card';
+            specialContent.innerHTML = `
+                <div class="result-header">
+                    <span class="result-icon">👑</span>
+                    <span class="result-title">アプリ限定！特別鑑定</span>
+                </div>
+                <div class="result-content">
+                    <p>アプリをインストールしていただいたあなただけの特別な鑑定結果です。</p>
+                    <p>今月のラッキーナンバー：7</p>
+                    <p>ラッキーカラー：ゴールド</p>
+                    <p>特別な出会いの日：15日</p>
+                </div>
+            `;
+            
+            if (document.getElementById('fortuneResultArea')) {
+                document.getElementById('fortuneResultArea').appendChild(specialContent);
+            }
+        }
+
+        // =====================================
+        // 🔥 究極のリテンション機能
+        // =====================================
+
+        // 1. 毎日ログインボーナス
+        function checkDailyBonus() {
+            const today = new Date().toDateString();
+            const lastLogin = localStorage.getItem('lastLogin');
+            
+            if (lastLogin !== today) {
+                localStorage.setItem('lastLogin', today);
+                let streak = parseInt(localStorage.getItem('loginStreak') || '0');
+                
+                // 前日ログインしていたら連続ボーナス
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                if (lastLogin === yesterday) {
+                    streak++;
+                } else {
+                    streak = 1;
+                }
+                
+                localStorage.setItem('loginStreak', streak.toString());
+                
+                // 連続ログインボーナス表示
+                if (streak > 1) {
+                    showLoginBonus(streak);
+                }
+            }
+        }
+
+        function showLoginBonus(streak) {
+            const bonuses = {
+                3: '特別鑑定1回無料',
+                7: '500円クーポン',
+                14: '1,000円クーポン',
+                30: 'VIP会員1ヶ月無料'
+            };
+            
+            const bonus = bonuses[streak];
+            if (bonus) {
+                showNotification('🎁 連続ログインボーナス！', `${streak}日連続達成！${bonus}をGET！`);
+            }
+        }
+
+        // 2. プッシュ通知もどき（LocalNotification）
+        function setupDailyReminder() {
+            // 毎日21時に通知を促す
+            const now = new Date();
+            const target = new Date();
+            target.setHours(21, 0, 0, 0);
+            
+            if (now > target) {
+                target.setDate(target.getDate() + 1);
+            }
+            
+            const timeout = target - now;
+            
+            setTimeout(() => {
+                if (isInStandaloneMode()) {
+                    showNotification('🔮 運命の時間', '今夜のあなたの運勢に重要な変化が...');
+                }
+                setupDailyReminder(); // 翌日も設定
+            }, timeout);
+        }
+
+        // 3. ゲーミフィケーション要素
+        function initGamification() {
+            // ポイントシステム
+            let points = parseInt(localStorage.getItem('userPoints') || '0');
+            
+            // アクションごとにポイント付与
+            const actions = {
+                'daily_login': 10,
+                'share_sns': 50,
+                'complete_reading': 30,
+                'purchase': 100,
+                'review': 200
+            };
+            
+            // レベルシステム
+            const level = Math.floor(points / 500) + 1;
+            const nextLevel = level * 500;
+            const progress = (points % 500) / 500 * 100;
+            
+            // UIに表示
+            if (document.getElementById('step3').classList.contains('active')) {
+                addLevelDisplay(level, progress);
+            }
+        }
+
+        function addLevelDisplay(level, progress) {
+            const display = document.createElement('div');
+            display.style.cssText = `
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                background: rgba(255,255,255,0.1);
+                padding: 10px 20px;
+                border-radius: 20px;
+                backdrop-filter: blur(10px);
+            `;
+            
+            display.innerHTML = `
+                <div style="color: #FFD700; font-weight: bold;">
+                    <div>Lv.${level} 占い師見習い</div>
+                    <div style="width: 100px; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; margin-top: 5px;">
+                        <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, #FFD700, #FF6B6B); border-radius: 2px;"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(display);
+        }
+
+        // 4. ソーシャル機能
+        function addShareButtons() {
+            const shareContainer = document.createElement('div');
+            shareContainer.style.cssText = `
+                position: fixed;
+                bottom: 100px;
+                left: 50%;
+                transform: translateX(-50%);
+                display: flex;
+                gap: 10px;
+                z-index: 1000;
+            `;
+            
+            shareContainer.innerHTML = `
+                <button onclick="shareToTwitter()" style="
+                    background: #1DA1F2;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                ">🐦 シェアで100P</button>
+                <button onclick="shareToLine()" style="
+                    background: #00B900;
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 20px;
+                    cursor: pointer;
+                ">💬 LINEで100P</button>
+            `;
+            
+            if (userData.step === 3) {
+                document.body.appendChild(shareContainer);
+            }
+        }
+
+        function shareToTwitter() {
+            const text = `【驚愕】KichiCompassの占いが当たりすぎる...！私の運命の人は${userData.name}様でした😍`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(window.location.href)}`;
+            window.open(url, '_blank');
+            
+            // ポイント付与
+            addPoints(100);
+            showNotification('🎉 100ポイントGET！', 'シェアありがとうございます！');
+        }
+
+        function shareToLine() {
+            const text = `KichiCompassの占いが凄すぎる！`;
+            const url = `https://line.me/R/msg/text/?${encodeURIComponent(text + '\n' + window.location.href)}`;
+            window.open(url, '_blank');
+            
+            addPoints(100);
+            showNotification('🎉 100ポイントGET！', 'シェアありがとうございます！');
+        }
+
+        // 5. リテンション最強施策：依存性メカニズム
+        function createAddictiveLoop() {
+            // 未読メッセージバッジ
+            if (!isInStandaloneMode()) return;
+            
+            const badge = document.createElement('div');
+            badge.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                background: red;
+                color: white;
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 12px;
+                font-weight: bold;
+            `;
+            badge.textContent = '3';
+            
+            document.body.appendChild(badge);
+            
+            // 3秒後に消えて焦らせる
+            setTimeout(() => {
+                badge.style.animation = 'pulse 0.5s ease-out';
+                setTimeout(() => badge.remove(), 500);
+            }, 3000);
+        }
+
+        // 6. 離脱防止の究極系
+        let exitAttempts = 0;
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && userData.step > 1) {
+                exitAttempts++;
+                
+                // タブを離れようとしたら
+                if (exitAttempts === 1) {
+                    document.title = '⚠️ 重要なお知らせがあります';
+                } else if (exitAttempts === 2) {
+                    document.title = '💔 お待ちください...';
+                } else {
+                    document.title = '😱 最後のチャンス！90%OFF';
+                }
+                
+                // 戻ってきたら特別オファー
+                setTimeout(() => {
+                    if (!document.hidden) {
+                        showUltraSpecialOffer();
+                    }
+                }, 100);
+            }
+        });
+
+        function showUltraSpecialOffer() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.95);
+                z-index: 999999;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            `;
+            
+            modal.innerHTML = `
+                <div style="background: white; padding: 40px; border-radius: 20px; text-align: center; max-width: 400px;">
+                    <h1 style="color: red; font-size: 32px; margin-bottom: 20px;">待って！</h1>
+                    <p style="color: #333; font-size: 18px; margin-bottom: 20px;">
+                        あなただけの特別価格<br>
+                        <span style="font-size: 48px; color: red; font-weight: bold;">95%OFF</span><br>
+                        通常4,800円→<span style="font-size: 32px; color: red;">240円</span>
+                    </p>
+                    <div style="background: #FFE4E4; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <p style="color: red; margin: 0;">⏰ このオファーは10秒後に消えます</p>
+                        <div id="ultraCountdown" style="font-size: 36px; color: red; font-weight: bold;">10</div>
+                    </div>
+                    <button onclick="processUltraPayment()" style="
+                        background: linear-gradient(45deg, red, #FF6B6B);
+                        color: white;
+                        border: none;
+                        padding: 20px 40px;
+                        border-radius: 30px;
+                        font-size: 20px;
+                        font-weight: bold;
+                        cursor: pointer;
+                        width: 100%;
+                        animation: pulse 1s infinite;
+                    ">今すぐ240円で始める</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            // カウントダウン
+            let count = 10;
+            const interval = setInterval(() => {
+                count--;
+                const countElement = document.getElementById('ultraCountdown');
+                if (countElement) {
+                    countElement.textContent = count;
+                }
+                if (count <= 0) {
+                    clearInterval(interval);
+                    modal.remove();
+                }
+            }, 1000);
+        }
+
+        // ポイント追加
+        function addPoints(amount) {
+            let points = parseInt(localStorage.getItem('userPoints') || '0');
+            points += amount;
+            localStorage.setItem('userPoints', points.toString());
+        }
+
         // カウントダウンタイマー
         function updateCountdown() {
             const now = new Date();
@@ -1789,6 +2310,11 @@
             setTimeout(() => {
                 hideLoading();
                 showStep3();
+                
+                // 課金後にPWAインストール促進
+                if (deferredPrompt) {
+                    setTimeout(() => showInstallBanner('payment'), 5000);
+                }
             }, 3000);
         }
 
@@ -1848,6 +2374,12 @@
             document.getElementById('moneyFortune').textContent = 
                 `金運が急上昇中！臨時収入の暗示があります。宝くじや懸賞での当選運も高まっています。`;
             
+            // シェアボタン追加
+            setTimeout(() => addShareButtons(), 2000);
+            
+            // ゲーミフィケーション表示
+            initGamification();
+            
             setTimeout(() => {
                 showSpecialOffer();
             }, 60000);
@@ -1857,7 +2389,34 @@
         function processPayment() {
             userData.converted = true;
             userData.conversionTime = new Date();
+            userData.totalSpent += 480;
             localStorage.setItem('userData', JSON.stringify(userData));
+            
+            // Google Analytics イベント送信
+            gtag('event', 'purchase', {
+                'value': 480,
+                'currency': 'JPY',
+                'items': [{
+                    'item_name': 'Premium Fortune Telling',
+                    'price': 480,
+                    'quantity': 1
+                }]
+            });
+            
+            // Stripe決済へ（テストモード）
+            window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
+        }
+
+        // 超特価決済
+        function processUltraPayment() {
+            userData.converted = true;
+            userData.totalSpent += 240;
+            localStorage.setItem('userData', JSON.stringify(userData));
+            
+            gtag('event', 'purchase', {
+                'value': 240,
+                'currency': 'JPY'
+            });
             
             window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
         }
@@ -1870,8 +2429,11 @@
             const interval = setInterval(() => {
                 const mins = Math.floor(seconds / 60);
                 const secs = seconds % 60;
-                document.getElementById('offerCountdown').textContent = 
-                    `00:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                const element = document.getElementById('offerCountdown');
+                if (element) {
+                    element.textContent = 
+                        `00:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                }
                 seconds--;
                 if (seconds < 0) {
                     clearInterval(interval);
@@ -1896,6 +2458,11 @@
 
         // ページ読み込み時
         window.addEventListener('DOMContentLoaded', () => {
+            // 訪問回数カウント
+            let visitCount = parseInt(localStorage.getItem('visitCount') || '0') + 1;
+            localStorage.setItem('visitCount', visitCount.toString());
+            
+            // 保存データ復元
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
@@ -1908,9 +2475,48 @@
                 }
             }
             
+            // 各種機能を初期化
+            checkDailyBonus();
+            setupDailyReminder();
+            
+            // PWAの場合は特別機能
+            if (isInStandaloneMode()) {
+                createAddictiveLoop();
+                document.body.style.paddingTop = '40px';
+                
+                // アプリモード専用ヘッダー
+                const appHeader = document.createElement('div');
+                appHeader.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 40px;
+                    background: linear-gradient(90deg, #667eea, #764ba2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-weight: bold;
+                    z-index: 10000;
+                `;
+                appHeader.innerHTML = '🔮 KichiCompass';
+                document.body.appendChild(appHeader);
+            }
+            
+            // 初回通知
             setTimeout(() => {
                 showNotification('🎉 歓迎', 'KichiCompassへようこそ！');
             }, 2000);
+            
+            // 3回目の訪問でPWA促進
+            if (visitCount === 3 && !localStorage.getItem('pwaInstalled')) {
+                setTimeout(() => {
+                    if (deferredPrompt) {
+                        showInstallBanner('return');
+                    }
+                }, 10000);
+            }
         });
     </script>
 </body>
