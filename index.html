@@ -3,18 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KichiCompass - あなただけの運命の羅針盤</title>
+    <title>【的中率98.7%】KichiCompass 無料占い - あなたの運命が今明らかに</title>
+    <meta name="description" content="驚異の的中率98.7%！3万人が体験した本格占い。恋愛・金運・健康運を完全無料で診断。今なら特別価格でプレミアム診断も。">
     
-    <!-- ホーム画面アイコン設定 -->
+    <!-- OGP設定 -->
+    <meta property="og:title" content="【無料】あなたの運命を占います - KichiCompass">
+    <meta property="og:description" content="3分で分かる！あなたの運命を無料診断">
+    <meta property="og:type" content="website">
+    
+    <!-- PWA対応 -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>🔮</text></svg>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="KichiCompass">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="application-name" content="KichiCompass">
     <meta name="theme-color" content="#667eea">
     
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -22,624 +28,1160 @@
         }
         
         body {
+            font-family: 'Noto Sans JP', sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
             min-height: 100vh;
             color: white;
+            overflow-x: hidden;
+            position: relative;
         }
-        
+
+        /* 背景のキラキラエフェクト */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+            animation: shimmer 20s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+
+        /* 浮遊する星 */
+        .floating-stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            color: rgba(255, 255, 255, 0.8);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
         .container {
             max-width: 500px;
             margin: 0 auto;
             padding: 20px;
+            position: relative;
+            z-index: 10;
         }
-        
-        /* ステップ表示 */
+
+        /* 固定ヘッダー */
+        .fixed-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e53);
+            padding: 10px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            animation: pulse-bg 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-bg {
+            0%, 100% { background: linear-gradient(90deg, #ff6b6b, #ff8e53); }
+            50% { background: linear-gradient(90deg, #ff8e53, #ffd93d); }
+        }
+
+        .countdown-timer {
+            font-size: 14px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .timer-number {
+            background: rgba(0,0,0,0.3);
+            padding: 2px 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 16px;
+        }
+
+        /* ステップ */
         .step {
             display: none;
-            animation: fadeIn 0.5s ease-in;
+            animation: slideIn 0.5s ease-out;
+            padding-top: 60px;
         }
-        
+
         .step.active {
             display: block;
         }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
-        
-        /* 神秘的なタイトル */
-        .title {
+
+        /* メインタイトル */
+        .main-title {
             text-align: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .title-emoji {
+            font-size: 60px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .title-text {
             font-size: 28px;
-            margin: 40px 0;
-            text-shadow: 0 0 20px rgba(255,255,255,0.5);
-            animation: glow 2s ease-in-out infinite;
+            font-weight: 900;
+            margin: 20px 0;
+            text-shadow: 
+                0 0 10px rgba(255,255,255,0.5),
+                0 0 20px rgba(255,255,255,0.3),
+                0 0 30px rgba(255,255,255,0.2);
+            animation: glow-text 2s ease-in-out infinite;
         }
-        
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 20px rgba(255,255,255,0.5); }
-            50% { text-shadow: 0 0 30px rgba(255,255,255,0.8); }
+
+        @keyframes glow-text {
+            0%, 100% { 
+                text-shadow: 
+                    0 0 10px rgba(255,255,255,0.5),
+                    0 0 20px rgba(255,255,255,0.3),
+                    0 0 30px rgba(255,255,255,0.2);
+            }
+            50% { 
+                text-shadow: 
+                    0 0 20px rgba(255,255,255,0.8),
+                    0 0 30px rgba(255,255,255,0.6),
+                    0 0 40px rgba(255,255,255,0.4);
+            }
         }
-        
-        /* 入力フォーム */
-        .input-group {
+
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        /* ソーシャルプルーフ */
+        .social-proof-container {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .user-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-size: 18px;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: live-pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes live-pulse {
+            0%, 100% { 
+                opacity: 1;
+                box-shadow: 0 0 0 0 rgba(0,255,0,0.7);
+            }
+            50% { 
+                opacity: 0.5;
+                box-shadow: 0 0 0 10px rgba(0,255,0,0);
+            }
+        }
+
+        .user-count {
+            color: #ffd700;
+            font-weight: bold;
+            font-size: 24px;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        /* 入力フィールド */
+        .input-container {
             margin: 30px 0;
         }
-        
+
         .input-label {
             display: block;
             margin-bottom: 10px;
             font-size: 14px;
             opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
-        
-        .input-field {
-            width: 100%;
-            padding: 15px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255,255,255,0.2);
+
+        .required-badge {
+            background: #ff6b6b;
             color: white;
-            font-size: 16px;
-            backdrop-filter: blur(10px);
-            transition: all 0.3s;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
         }
-        
-        .input-field::placeholder {
-            color: rgba(255,255,255,0.6);
-        }
-        
-        .input-field:focus {
-            outline: none;
-            background: rgba(255,255,255,0.3);
-            box-shadow: 0 0 30px rgba(255,255,255,0.3);
-        }
-        
-        /* 魔法のボタン */
-        .magic-button {
+
+        .input-field {
             width: 100%;
             padding: 18px;
             border: none;
+            border-radius: 15px;
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .input-field:focus {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(0,0,0,0.3),
+                0 0 0 3px rgba(255,215,0,0.5);
+        }
+
+        .input-field::placeholder {
+            color: #999;
+        }
+
+        /* CTAボタン */
+        .cta-button {
+            width: 100%;
+            padding: 20px;
+            border: none;
             border-radius: 50px;
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
             font-size: 18px;
-            font-weight: bold;
+            font-weight: 900;
             cursor: pointer;
             transition: all 0.3s;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: 
+                0 10px 25px rgba(255,165,0,0.4),
+                inset 0 1px 0 rgba(255,255,255,0.4);
             position: relative;
             overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
-        
-        .magic-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.5s;
         }
-        
-        .magic-button:active {
-            transform: translateY(0);
+
+        .cta-button:hover::before {
+            left: 100%;
         }
-        
-        /* ローディングアニメーション */
-        .loading {
+
+        .cta-button:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 
+                0 15px 35px rgba(255,165,0,0.5),
+                inset 0 1px 0 rgba(255,255,255,0.4);
+        }
+
+        .cta-button:active {
+            transform: translateY(0) scale(1);
+        }
+
+        /* 緊急バナー */
+        .urgency-banner {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            padding: 12px;
+            text-align: center;
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(255,107,107,0.3);
+        }
+
+        .urgency-banner::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                45deg,
+                transparent 30%,
+                rgba(255,255,255,0.1) 50%,
+                transparent 70%
+            );
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .urgency-text {
+            position: relative;
+            z-index: 1;
+            font-weight: bold;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ローディング */
+        .loading-container {
             display: none;
             text-align: center;
-            padding: 40px;
+            padding: 60px 20px;
         }
-        
-        .loading.active {
+
+        .loading-container.active {
             display: block;
         }
-        
-        .spinner {
-            width: 60px;
-            height: 60px;
-            margin: 0 auto 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-top-color: white;
+
+        .loading-spinner {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 30px;
+            position: relative;
+        }
+
+        .loading-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(255,255,255,0.2);
             border-radius: 50%;
+        }
+
+        .loading-ring:nth-child(1) {
+            border-top-color: #ffd700;
             animation: spin 1s linear infinite;
         }
-        
+
+        .loading-ring:nth-child(2) {
+            border-right-color: #ff6b6b;
+            animation: spin 1.5s linear infinite reverse;
+            width: 60px;
+            height: 60px;
+            top: 10px;
+            left: 10px;
+        }
+
+        .loading-ring:nth-child(3) {
+            border-bottom-color: #4ecdc4;
+            animation: spin 2s linear infinite;
+            width: 40px;
+            height: 40px;
+            top: 20px;
+            left: 20px;
+        }
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
-        .loading-text {
-            font-size: 16px;
-            opacity: 0.9;
-            animation: pulse 1.5s ease-in-out infinite;
+
+        .loading-messages {
+            margin-top: 20px;
         }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 0.9; }
-            50% { opacity: 0.5; }
+
+        .loading-message {
+            font-size: 18px;
+            margin: 10px 0;
+            opacity: 0;
+            animation: fadeInOut 1s ease-in-out;
         }
-        
-        /* 仮診断結果 */
-        .preview-result {
+
+        .loading-message.active {
+            opacity: 1;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(10px); }
+            50% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+
+        /* 結果カード */
+        .result-card {
             background: rgba(255,255,255,0.1);
-            border-radius: 15px;
+            border-radius: 20px;
             padding: 25px;
             margin: 20px 0;
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
         }
-        
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, #ffd700, #ff6b6b, #4ecdc4, #ffd700);
+            border-radius: 20px;
+            opacity: 0;
+            z-index: -1;
+            transition: opacity 0.3s;
+        }
+
+        .result-card:hover::before {
+            opacity: 1;
+            animation: gradient-border 3s linear infinite;
+        }
+
+        @keyframes gradient-border {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .result-icon {
+            font-size: 30px;
+            animation: icon-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes icon-glow {
+            0%, 100% { filter: drop-shadow(0 0 5px rgba(255,255,255,0.5)); }
+            50% { filter: drop-shadow(0 0 15px rgba(255,255,255,0.8)); }
+        }
+
         .result-title {
             font-size: 20px;
-            margin-bottom: 15px;
+            font-weight: bold;
             color: #ffd700;
         }
-        
-        .result-text {
+
+        .result-content {
             line-height: 1.8;
-            opacity: 0.95;
+            font-size: 16px;
         }
-        
-        .blur-text {
-            filter: blur(3px);
-            user-select: none;
+
+        /* ぼかし効果 */
+        .blur-container {
             position: relative;
+            margin: 20px 0;
         }
-        
+
+        .blur-content {
+            filter: blur(8px);
+            user-select: none;
+            padding: 20px;
+        }
+
         .unlock-overlay {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.8);
-            padding: 15px 25px;
-            border-radius: 10px;
-            white-space: nowrap;
-        }
-        
-        /* 緊急性を煽る要素 */
-        .urgency-banner {
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
-            padding: 10px;
+            background: rgba(0,0,0,0.9);
+            padding: 20px 30px;
+            border-radius: 15px;
             text-align: center;
-            border-radius: 10px;
-            margin: 20px 0;
-            animation: blink 2s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.8; }
+
+        .unlock-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
         }
-        
-        .countdown {
-            font-size: 24px;
+
+        .unlock-text {
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .unlock-button {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
             font-weight: bold;
-            color: #ffd700;
-            text-align: center;
-            margin: 20px 0;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        /* 社会的証明 */
-        .social-proof {
-            background: rgba(0,0,0,0.3);
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            text-align: center;
+
+        .unlock-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(255,215,0,0.5);
+        }
+
+        /* プログレスバー */
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .progress-label {
             font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
         }
-        
-        .user-count {
-            font-size: 20px;
+
+        .progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255,255,255,0.3),
+                transparent
+            );
+            animation: progress-shine 2s linear infinite;
+        }
+
+        @keyframes progress-shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .progress-percentage {
+            text-align: right;
+            font-size: 12px;
+            margin-top: 5px;
             color: #ffd700;
             font-weight: bold;
         }
-        
-        /* ホーム画面追加誘導ポップアップ */
-        .add-to-home-popup {
+
+        /* 評価星 */
+        .rating-container {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 20px 0;
+        }
+
+        .rating-star {
+            color: #ffd700;
+            font-size: 24px;
+            animation: star-twinkle 1s ease-in-out infinite;
+        }
+
+        .rating-star:nth-child(1) { animation-delay: 0s; }
+        .rating-star:nth-child(2) { animation-delay: 0.2s; }
+        .rating-star:nth-child(3) { animation-delay: 0.4s; }
+        .rating-star:nth-child(4) { animation-delay: 0.6s; }
+        .rating-star:nth-child(5) { animation-delay: 0.8s; }
+
+        @keyframes star-twinkle {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* 通知ポップアップ */
+        .notification-popup {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            right: 20px;
             background: white;
             color: #333;
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            z-index: 99999;
-            animation: slideUp 0.3s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .add-to-home-content h3 {
-            margin-bottom: 10px;
-            color: #667eea;
-        }
-
-        .add-to-home-content ol {
-            margin: 15px 0;
-            padding-left: 20px;
-        }
-
-        .add-to-home-content button {
-            width: 100%;
-            padding: 12px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        /* プッシュ通知風 */
-        .push-notification {
-            position: fixed;
-            top: 20px;
-            right: -400px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             padding: 15px 20px;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            max-width: 350px;
-            transition: right 0.3s ease;
-            z-index: 10000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            transform: translateX(-400px);
+            transition: transform 0.3s ease-out;
+            z-index: 1000;
+            max-width: 300px;
         }
 
-        .push-notification.show {
-            right: 20px;
+        .notification-popup.show {
+            transform: translateX(0);
+        }
+
+        .notification-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
         }
 
         .notification-icon {
-            font-size: 24px;
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
         }
 
-        .notification-text {
-            flex: 1;
+        .notification-title {
+            font-weight: bold;
             font-size: 14px;
-            line-height: 1.4;
         }
 
-        /* 離脱ポップアップ */
-        .exit-popup {
+        .notification-message {
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* フローティングアクションボタン */
+        .fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 100;
+            animation: fab-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes fab-pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 5px 20px rgba(255,107,107,0.4);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 8px 30px rgba(255,107,107,0.6);
+            }
+        }
+
+        .fab:hover {
+            transform: scale(1.15) rotate(15deg);
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 480px) {
+            .title-text {
+                font-size: 24px;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .notification-popup {
+                left: 10px;
+                right: 10px;
+                max-width: none;
+            }
+        }
+
+        /* 特別オファーモーダル */
+        .special-offer-modal {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.9);
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 10000;
             opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: 99999;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
 
-        .exit-popup.show {
+        .special-offer-modal.show {
             opacity: 1;
+            pointer-events: all;
         }
 
-        .exit-popup-content {
+        .special-offer-content {
             background: white;
             border-radius: 20px;
             padding: 40px;
-            max-width: 500px;
+            max-width: 400px;
+            width: 90%;
             text-align: center;
             color: #333;
             position: relative;
-            animation: shake 0.5s ease;
+            animation: modal-bounce 0.5s ease-out;
         }
 
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
+        @keyframes modal-bounce {
+            0% { transform: scale(0.8) translateY(50px); opacity: 0; }
+            80% { transform: scale(1.05) translateY(-10px); }
+            100% { transform: scale(1) translateY(0); opacity: 1; }
         }
 
-        .exit-popup h2 {
-            color: #ff6b6b;
-            margin-bottom: 20px;
-            font-size: 32px;
-        }
-
-        .exit-main-message {
-            font-size: 18px;
-            margin: 20px 0;
-            line-height: 1.6;
-        }
-
-        .countdown-large {
-            font-size: 36px;
-            color: #ff6b6b;
-            font-weight: bold;
-            display: block;
-            margin: 10px 0;
-        }
-
-        .exit-warning {
-            background: #fff3cd;
-            color: #856404;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 20px 0;
-            border: 2px solid #ffc107;
-        }
-
-        .exit-offer {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-        }
-
-        .offer-badge {
-            background: #ffd700;
-            color: #333;
-            padding: 5px 15px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-
-        .offer-price {
+        .offer-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 30px;
+            height: 30px;
+            background: #f0f0f0;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px;
-            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .original-price {
-            text-decoration: line-through;
-            opacity: 0.7;
+        .offer-close:hover {
+            background: #ff6b6b;
+            color: white;
+            transform: rotate(90deg);
         }
 
-        .special-price {
-            color: #ffd700;
+        .offer-title {
+            font-size: 28px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            font-weight: 900;
+        }
+
+        .offer-countdown {
+            font-size: 36px;
+            color: #333;
             font-weight: bold;
-            font-size: 32px;
+            margin: 20px 0;
+            font-family: monospace;
         }
 
-        .exit-cta {
-            background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+        .offer-price {
+            margin: 20px 0;
+        }
+
+        .offer-original {
+            text-decoration: line-through;
+            color: #999;
+            font-size: 18px;
+        }
+
+        .offer-discount {
+            font-size: 48px;
+            color: #ff6b6b;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        .offer-final {
+            font-size: 32px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .offer-cta {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
             color: white;
             border: none;
-            padding: 20px 40px;
+            padding: 18px 40px;
             border-radius: 50px;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
             cursor: pointer;
-            margin: 10px;
-            transition: transform 0.3s ease;
+            margin-top: 20px;
+            transition: all 0.3s;
+            width: 100%;
         }
 
-        .exit-cta:hover {
-            transform: scale(1.05);
-        }
-
-        .exit-close {
-            background: transparent;
-            color: #999;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            text-decoration: underline;
-            margin-top: 10px;
-        }
-
-        /* 診断結果の詳細 */
-        .fortune-details {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 15px;
-        }
-
-        .fortune-category {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 10px;
-        }
-
-        .fortune-category h3 {
-            color: #ffd700;
-            margin-bottom: 10px;
-        }
-
-        .fortune-locked {
-            filter: blur(5px);
-            position: relative;
-            padding: 20px;
-            user-select: none;
-        }
-
-        .unlock-button {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(45deg, #ffd700, #ffed4e);
-            color: #333;
-            padding: 15px 30px;
-            border-radius: 50px;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 5px 20px rgba(255,215,0,0.5);
+        .offer-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255,107,107,0.4);
         }
     </style>
 </head>
 <body>
+    <!-- 浮遊する星 -->
+    <div class="floating-stars">
+        <span class="star" style="top: 10%; left: 20%; font-size: 20px; animation-delay: 0s;">✨</span>
+        <span class="star" style="top: 30%; left: 80%; font-size: 16px; animation-delay: 1s;">⭐</span>
+        <span class="star" style="top: 60%; left: 10%; font-size: 24px; animation-delay: 2s;">🌟</span>
+        <span class="star" style="top: 80%; left: 70%; font-size: 18px; animation-delay: 3s;">✨</span>
+        <span class="star" style="top: 40%; left: 50%; font-size: 22px; animation-delay: 4s;">⭐</span>
+    </div>
+
+    <!-- 固定ヘッダー -->
+    <div class="fixed-header">
+        <div class="countdown-timer">
+            <span>⚡ 初回90%OFF終了まで</span>
+            <span class="timer-number" id="hours">00</span>
+            <span>:</span>
+            <span class="timer-number" id="minutes">00</span>
+            <span>:</span>
+            <span class="timer-number" id="seconds">00</span>
+        </div>
+    </div>
+
     <div class="container">
-        <!-- ステップ1: 名前入力 -->
+        <!-- ステップ1: 初期画面 -->
         <div class="step active" id="step1">
-            <h1 class="title">✨ あなたの運命が呼んでいます ✨</h1>
-            
-            <div class="social-proof">
-                現在 <span class="user-count" id="activeUsers">2,847</span> 人が鑑定中
+            <div class="main-title">
+                <div class="title-emoji">🔮</div>
+                <h1 class="title-text">あなたの運命が呼んでいます</h1>
+                <p class="subtitle">3万人が体験した驚異の的中率98.7%</p>
             </div>
-            
-            <div class="input-group">
-                <label class="input-label">あなたのお名前を教えてください</label>
+
+            <div class="social-proof-container">
+                <div class="user-counter">
+                    <div class="live-dot"></div>
+                    <span>現在</span>
+                    <span class="user-count" id="activeUsers">2,847</span>
+                    <span>人が鑑定中</span>
+                </div>
+            </div>
+
+            <div class="rating-container">
+                <span class="rating-star">⭐</span>
+                <span class="rating-star">⭐</span>
+                <span class="rating-star">⭐</span>
+                <span class="rating-star">⭐</span>
+                <span class="rating-star">⭐</span>
+            </div>
+
+            <div class="input-container">
+                <label class="input-label">
+                    お名前
+                    <span class="required-badge">必須</span>
+                </label>
                 <input type="text" class="input-field" id="userName" placeholder="ニックネームでもOK" autocomplete="off">
             </div>
-            
-            <button class="magic-button" onclick="processStep1()">
-                無料で運命を確認する →
+
+            <button class="cta-button" onclick="processStep1()">
+                無料で運命を確認する
             </button>
-            
+
             <div class="urgency-banner">
-                ⚡ 本日限定！通常3,980円→完全無料 ⚡
+                <div class="urgency-text">⚡ 本日限定！通常4,800円→完全無料 ⚡</div>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-label">本日の無料診断枠</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 87%"></div>
+                </div>
+                <div class="progress-percentage">残り13%</div>
             </div>
         </div>
-        
-        <!-- ローディング画面 -->
-        <div class="loading" id="loading">
-            <div class="spinner"></div>
-            <div class="loading-text" id="loadingText">
-                宇宙からメッセージを受信中...
+
+        <!-- ローディング -->
+        <div class="loading-container" id="loading">
+            <div class="loading-spinner">
+                <div class="loading-ring"></div>
+                <div class="loading-ring"></div>
+                <div class="loading-ring"></div>
+            </div>
+            <div class="loading-messages">
+                <div class="loading-message" id="loadingText">宇宙からメッセージを受信中...</div>
             </div>
         </div>
-        
-        <!-- ステップ2: 仮診断結果 -->
+
+        <!-- ステップ2: 詳細入力 -->
         <div class="step" id="step2">
-            <h1 class="title">🌟 <span id="displayName"></span>様の運命 🌟</h1>
-            
-            <div class="preview-result">
-                <div class="result-title">⚡ 緊急メッセージ</div>
-                <div class="result-text" id="previewMessage"></div>
+            <div class="main-title">
+                <h2 class="title-text">🌟 <span id="displayName"></span>様の運命 🌟</h2>
             </div>
-            
-            <div class="preview-result">
-                <div class="result-title">💕 恋愛運</div>
-                <div class="result-text">
-                    <span id="lovePreview"></span>
-                    <div class="blur-text">
-                        実は、あなたのことを密かに想っている人が...
-                        <div class="unlock-overlay">🔒 詳細を見るには生年月日が必要</div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">⚡</span>
+                    <span class="result-title">緊急メッセージ</span>
+                </div>
+                <div class="result-content" id="previewMessage"></div>
+            </div>
+
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">💕</span>
+                    <span class="result-title">恋愛運の詳細</span>
+                </div>
+                <div class="result-content">
+                    <p id="lovePreview"></p>
+                    <div class="blur-container">
+                        <div class="blur-content">
+                            実は、あなたのことを密かに想っている人が3人います。
+                            その中の1人は、あなたもよく知っている...
+                        </div>
+                        <div class="unlock-overlay">
+                            <div class="unlock-icon">🔒</div>
+                            <div class="unlock-text">詳細を見るには生年月日が必要です</div>
+                        </div>
                     </div>
                 </div>
             </div>
-            
-            <div class="countdown" id="countdown">
-                詳細診断まで残り: <span id="timer">05:00</span>
-            </div>
-            
-            <div class="input-group">
-                <label class="input-label">より正確な診断のために生年月日を入力</label>
+
+            <div class="input-container">
+                <label class="input-label">
+                    生年月日
+                    <span class="required-badge">必須</span>
+                </label>
                 <input type="date" class="input-field" id="birthDate">
             </div>
-            
-            <button class="magic-button" onclick="processStep2()">
-                完全版を今すぐ確認する →
+
+            <button class="cta-button" onclick="processStep2()">
+                完全版を今すぐ確認する
             </button>
         </div>
-        
-        <!-- ステップ3: 最終フック -->
+
+        <!-- ステップ3: 最終結果 -->
         <div class="step" id="step3">
-            <h1 class="title">⚠️ 重要な警告 ⚠️</h1>
-            
-            <div class="preview-result">
-                <div class="result-title">🔮 <span id="finalName"></span>様だけへの特別なメッセージ</div>
-                <div class="result-text" id="criticalMessage"></div>
+            <div class="main-title">
+                <h2 class="title-text">⚠️ 重要な警告 ⚠️</h2>
             </div>
 
-            <!-- 詳細な占い結果 -->
-            <div class="fortune-details">
-                <div class="fortune-category">
-                    <h3>💕 恋愛運の詳細</h3>
-                    <p id="loveFortune">今月は特別な出会いの予感が...運命の人の特徴は...</p>
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">🔮</span>
+                    <span class="result-title"><span id="finalName"></span>様への特別メッセージ</span>
                 </div>
+                <div class="result-content" id="criticalMessage"></div>
+            </div>
 
-                <div class="fortune-category">
-                    <h3>💰 金運の詳細</h3>
-                    <p id="moneyFortune">臨時収入の可能性が！特に15日前後は...</p>
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">💕</span>
+                    <span class="result-title">恋愛運の真実</span>
                 </div>
+                <div class="result-content" id="loveFortune"></div>
+            </div>
 
-                <div class="fortune-locked">
-                    <div class="fortune-category">
-                        <h3>⚠️ 注意すべき日</h3>
-                        <p>今月の要注意日は...この日だけは絶対に...</p>
+            <div class="result-card">
+                <div class="result-header">
+                    <span class="result-icon">💰</span>
+                    <span class="result-title">金運の転機</span>
+                </div>
+                <div class="result-content" id="moneyFortune"></div>
+            </div>
+
+            <div class="blur-container">
+                <div class="blur-content">
+                    <div class="result-card">
+                        <div class="result-header">
+                            <span class="result-icon">⚠️</span>
+                            <span class="result-title">絶対に避けるべき日</span>
+                        </div>
+                        <div class="result-content">
+                            今月の●日は絶対に重要な決断をしてはいけません。
+                            この日に行動すると...
+                        </div>
                     </div>
-                    <div class="fortune-category">
-                        <h3>🌟 最高の幸運日</h3>
-                        <p>あなたの運命が大きく動く日は...</p>
-                    </div>
+                </div>
+                <div class="unlock-overlay">
+                    <div class="unlock-icon">🔓</div>
+                    <div class="unlock-text">続きを読む</div>
                     <button class="unlock-button" onclick="processPayment()">
-                        🔓 続きを読む（480円）
+                        今だけ480円で解放
                     </button>
                 </div>
             </div>
-            
-            <button class="magic-button" style="background: linear-gradient(45deg, #ffd700, #ffed4e); margin-top: 30px;" onclick="processPayment()">
-                今すぐ全てを知る（特別価格480円）
+
+            <button class="cta-button" onclick="processPayment()">
+                完全な診断結果を見る（特別価格480円）
             </button>
-            
-            <div class="social-proof" style="margin-top: 20px;">
-                ⭐ 98.7%の方が「人生が変わった」と回答
+
+            <div class="social-proof-container">
+                <p>⭐ 98.7%の方が「人生が変わった」と回答</p>
             </div>
         </div>
     </div>
-    
+
+    <!-- フローティングアクションボタン -->
+    <div class="fab" onclick="showSpecialOffer()">
+        🎁
+    </div>
+
+    <!-- 特別オファーモーダル -->
+    <div class="special-offer-modal" id="specialOfferModal">
+        <div class="special-offer-content">
+            <div class="offer-close" onclick="closeSpecialOffer()">✕</div>
+            <h2 class="offer-title">😱 ちょっと待って！</h2>
+            <p>今だけの特別オファー</p>
+            <div class="offer-countdown" id="offerCountdown">00:05:00</div>
+            <div class="offer-price">
+                <div class="offer-original">通常価格 ¥4,800</div>
+                <div class="offer-discount">90% OFF</div>
+                <div class="offer-final">¥480</div>
+            </div>
+            <button class="offer-cta" onclick="processPayment()">
+                今すぐ特別価格で始める
+            </button>
+        </div>
+    </div>
+
     <script>
-        // ユーザーデータ保存
+        // ユーザーデータ
         let userData = {
             name: '',
             birthDate: '',
             startTime: new Date(),
             step: 1
         };
-        
-        // 偽のアクティブユーザー数を動的に変更
-        setInterval(() => {
-            const users = document.getElementById('activeUsers');
-            if (users) {
-                const current = parseInt(users.textContent);
-                const change = Math.floor(Math.random() * 50) - 25;
-                users.textContent = Math.max(2000, current + change).toLocaleString();
+
+        // カウントダウンタイマー
+        function updateCountdown() {
+            const now = new Date();
+            const tonight = new Date();
+            tonight.setHours(23, 59, 59);
+            const diff = tonight - now;
+            
+            const hours = Math.floor(diff / 3600000);
+            const minutes = Math.floor((diff % 3600000) / 60000);
+            const seconds = Math.floor((diff % 60000) / 1000);
+            
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+        }
+        setInterval(updateCountdown, 1000);
+
+        // アクティブユーザー数の動的更新
+        function updateActiveUsers() {
+            const element = document.getElementById('activeUsers');
+            if (element) {
+                const current = parseInt(element.textContent.replace(',', ''));
+                const change = Math.floor(Math.random() * 100) - 50;
+                const newCount = Math.max(2000, current + change);
+                element.textContent = newCount.toLocaleString();
             }
-        }, 3000);
-        
+        }
+        setInterval(updateActiveUsers, 3000);
+
+        // 通知ポップアップ
+        function showNotification(title, message) {
+            const popup = document.createElement('div');
+            popup.className = 'notification-popup';
+            popup.innerHTML = `
+                <div class="notification-header">
+                    <div class="notification-icon">K</div>
+                    <div class="notification-title">${title}</div>
+                </div>
+                <div class="notification-message">${message}</div>
+            `;
+            document.body.appendChild(popup);
+            
+            setTimeout(() => popup.classList.add('show'), 100);
+            setTimeout(() => {
+                popup.classList.remove('show');
+                setTimeout(() => popup.remove(), 300);
+            }, 4000);
+        }
+
+        // ランダムな通知
+        function randomNotifications() {
+            const notifications = [
+                { title: '東京都 A様', message: 'プレミアム診断を申し込みました' },
+                { title: '大阪府 M様', message: '「驚くほど当たってる！」' },
+                { title: '福岡県 S様', message: '恋愛成就のお礼メッセージ' },
+                { title: '北海道 K様', message: 'VIPプランに登録しました' },
+                { title: '愛知県 T様', message: '金運が急上昇！宝くじ当選' }
+            ];
+            
+            const notification = notifications[Math.floor(Math.random() * notifications.length)];
+            showNotification(notification.title, notification.message);
+        }
+        setInterval(randomNotifications, 15000);
+
         // ステップ1処理
         function processStep1() {
             const name = document.getElementById('userName').value;
             if (!name) {
-                alert('お名前を入力してください');
+                showNotification('⚠️ エラー', 'お名前を入力してください');
                 return;
             }
             
             userData.name = name;
             localStorage.setItem('userData', JSON.stringify(userData));
             
-            // ローディング演出
             showLoading();
-            
             setTimeout(() => {
                 hideLoading();
                 showStep2(name);
             }, 3000);
         }
-        
+
         // ローディング表示
         function showLoading() {
-            document.getElementById('step1').classList.remove('active');
+            document.querySelector('.step.active').classList.remove('active');
             document.getElementById('loading').classList.add('active');
             
-            // ローディングテキストを変更
-            const texts = [
+            const messages = [
                 '宇宙からメッセージを受信中...',
                 'あなたの運命を解析中...',
                 '守護霊と交信中...',
@@ -648,25 +1190,29 @@
             
             let index = 0;
             const interval = setInterval(() => {
-                document.getElementById('loadingText').textContent = texts[index];
+                const element = document.getElementById('loadingText');
+                element.classList.remove('active');
+                setTimeout(() => {
+                    element.textContent = messages[index];
+                    element.classList.add('active');
+                }, 50);
                 index++;
-                if (index >= texts.length) {
+                if (index >= messages.length) {
                     clearInterval(interval);
                 }
-            }, 700);
+            }, 1000);
         }
-        
+
         // ローディング非表示
         function hideLoading() {
             document.getElementById('loading').classList.remove('active');
         }
-        
+
         // ステップ2表示
         function showStep2(name) {
             document.getElementById('step2').classList.add('active');
             document.getElementById('displayName').textContent = name;
             
-            // パーソナライズされたメッセージ
             const messages = [
                 `${name}様、実は昨日からあなたのことが気になっていました...`,
                 `${name}様に今すぐ伝えなければならないことがあります...`,
@@ -674,56 +1220,27 @@
             ];
             
             const loveMessages = [
-                '現在、恋愛運が急上昇中！',
-                '運命の人との出会いが近づいています',
-                '今月は恋愛における重要な転機'
+                '恋愛運が急上昇中！運命の出会いが近づいています',
+                '今月は恋愛における重要な転機となるでしょう',
+                'あなたの魅力が最高潮に達しています'
             ];
             
             document.getElementById('previewMessage').textContent = 
                 messages[Math.floor(Math.random() * messages.length)];
-            
             document.getElementById('lovePreview').textContent = 
                 loveMessages[Math.floor(Math.random() * loveMessages.length)];
             
-            // カウントダウン開始
-            startCountdown();
-            
-            // 30秒後に不安メッセージ
+            // 30秒後に通知
             setTimeout(() => {
-                showNotification('重要：明日までに行動しないと運気が...', 'warning');
+                showNotification('⚠️ 重要', '明日までに行動しないと運気が下降します');
             }, 30000);
         }
-        
-        // カウントダウンタイマー
-        function startCountdown() {
-            let seconds = 300; // 5分
-            const timer = setInterval(() => {
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
-                const timerElement = document.getElementById('timer');
-                if (timerElement) {
-                    timerElement.textContent = 
-                        `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-                }
-                
-                seconds--;
-                
-                if (seconds < 0) {
-                    clearInterval(timer);
-                    const countdownElement = document.getElementById('countdown');
-                    if (countdownElement) {
-                        countdownElement.innerHTML = 
-                            '<span style="color: #ff6b6b;">⚠️ 時間切れ！特別オファーが終了しました</span>';
-                    }
-                }
-            }, 1000);
-        }
-        
+
         // ステップ2処理
         function processStep2() {
             const birthDate = document.getElementById('birthDate').value;
             if (!birthDate) {
-                alert('生年月日を入力してください');
+                showNotification('⚠️ エラー', '生年月日を入力してください');
                 return;
             }
             
@@ -732,20 +1249,17 @@
             localStorage.setItem('userData', JSON.stringify(userData));
             
             showLoading();
-            
             setTimeout(() => {
                 hideLoading();
                 showStep3();
             }, 3000);
         }
-        
+
         // ステップ3表示
         function showStep3() {
-            document.getElementById('step2').classList.remove('active');
             document.getElementById('step3').classList.add('active');
             document.getElementById('finalName').textContent = userData.name;
             
-            // 緊急性の高いメッセージ
             const criticalMessages = [
                 `${userData.name}様、これは偶然ではありません。今このタイミングでこのメッセージを読んでいるのには深い意味があります。`,
                 `実は、${userData.name}様の運命に関わる重要な転機が訪れています。しかし、正しい選択をしないと...`,
@@ -755,184 +1269,67 @@
             document.getElementById('criticalMessage').textContent = 
                 criticalMessages[Math.floor(Math.random() * criticalMessages.length)];
             
-            // 詳細な占い結果を生成
-            generateDetailedFortune();
-            
-            // 60秒後に期待メッセージ
-            setTimeout(() => {
-                showNotification('実は、あなたのことを想っている人が...', 'hope');
-            }, 60000);
-        }
-        
-        // 詳細な占い結果を生成
-        function generateDetailedFortune() {
-            const loveFortuneTexts = [
-                `${userData.name}様の恋愛運は今、特別な転機を迎えています。特に今月の15日前後は重要な出会いの可能性が...`,
-                `運命の人はすぐ近くにいます。その人の特徴は、優しい笑顔と温かい心を持った...`,
-                `${userData.name}様の魅力が最高潮に達しています。今がアプローチの最高のタイミング...`
-            ];
-            
-            const moneyFortuneTexts = [
-                `金運が急上昇中！特に宝くじや懸賞での当選運が...臨時収入の可能性も...`,
-                `今月は投資のチャンス。ただし、22日だけは絶対に大きな買い物を避けて...`,
-                `${userData.name}様の才能が認められ、収入アップの可能性が...`
-            ];
-            
+            // 詳細な占い結果
             document.getElementById('loveFortune').textContent = 
-                loveFortuneTexts[Math.floor(Math.random() * loveFortuneTexts.length)];
+                `${userData.name}様の恋愛運は今、特別な転機を迎えています。特に今月の15日前後は重要な出会いの可能性が高まっています。`;
             
             document.getElementById('moneyFortune').textContent = 
-                moneyFortuneTexts[Math.floor(Math.random() * moneyFortuneTexts.length)];
-        }
-        
-        // プッシュ通知風メッセージ
-        function showNotification(message, type = 'warning') {
-            const notification = document.createElement('div');
-            notification.className = 'push-notification';
-            notification.innerHTML = `
-                <div class="notification-icon">${type === 'warning' ? '⚠️' : '✨'}</div>
-                <div class="notification-text">${message}</div>
-            `;
+                `金運が急上昇中！臨時収入の暗示があります。宝くじや懸賞での当選運も高まっています。`;
             
-            document.body.appendChild(notification);
-            
+            // 60秒後に特別オファー
             setTimeout(() => {
-                notification.classList.add('show');
-            }, 100);
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
+                showSpecialOffer();
+            }, 60000);
         }
-        
+
         // 決済処理
         function processPayment() {
             userData.converted = true;
             userData.conversionTime = new Date();
             localStorage.setItem('userData', JSON.stringify(userData));
             
-            // 最初の480円決済へ
+            // Stripe決済へ
             window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
         }
-        
-        // 離脱防止ポップアップ
+
+        // 特別オファー表示
+        function showSpecialOffer() {
+            document.getElementById('specialOfferModal').classList.add('show');
+            
+            // カウントダウン
+            let seconds = 300;
+            const interval = setInterval(() => {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                document.getElementById('offerCountdown').textContent = 
+                    `00:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                seconds--;
+                if (seconds < 0) {
+                    clearInterval(interval);
+                    closeSpecialOffer();
+                }
+            }, 1000);
+        }
+
+        // 特別オファーを閉じる
+        function closeSpecialOffer() {
+            document.getElementById('specialOfferModal').classList.remove('show');
+        }
+
+        // 離脱防止
         let exitIntentShown = false;
         document.addEventListener('mouseleave', (e) => {
             if (e.clientY <= 0 && !exitIntentShown && userData.step > 1 && !userData.converted) {
                 exitIntentShown = true;
-                showExitPopup();
+                showSpecialOffer();
             }
         });
-        
-        function showExitPopup() {
-            const popup = document.createElement('div');
-            popup.className = 'exit-popup';
-            popup.innerHTML = `
-                <div class="exit-popup-content">
-                    <h2>😱 ちょっと待って！</h2>
-                    <p class="exit-main-message">
-                        ${userData.name}様の運命の転機まで<br>
-                        <span class="countdown-large">あと12時間</span>
-                    </p>
-                    <div class="exit-warning">
-                        ⚠️ 今離れると、この特別な診断結果は二度と見られません
-                    </div>
-                    <div class="exit-offer">
-                        <div class="offer-badge">最後のチャンス</div>
-                        <div class="offer-price">
-                            <span class="original-price">通常4,800円</span>
-                            <span class="arrow">→</span>
-                            <span class="special-price">今だけ480円</span>
-                        </div>
-                    </div>
-                    <button class="exit-cta" onclick="acceptExitOffer()">
-                        運命を確認する（90%OFF）
-                    </button>
-                    <button class="exit-close" onclick="closeExitPopup()">
-                        本当に諦める
-                    </button>
-                </div>
-            `;
-            
-            document.body.appendChild(popup);
-            setTimeout(() => popup.classList.add('show'), 100);
-        }
-        
-        function acceptExitOffer() {
-            closeExitPopup();
-            processPayment();
-        }
-        
-        function closeExitPopup() {
-            const popup = document.querySelector('.exit-popup');
-            if (popup) {
-                popup.classList.remove('show');
-                setTimeout(() => popup.remove(), 300);
-            }
-        }
-        
-        // ホーム画面追加の誘導
-        function showAddToHomeScreen() {
-            // iOSの場合
-            if (/iPhone|iPad|iPod/.test(navigator.userAgent)) {
-                const popup = document.createElement('div');
-                popup.className = 'add-to-home-popup';
-                popup.innerHTML = `
-                    <div class="add-to-home-content">
-                        <h3>📱 アプリのように使えます！</h3>
-                        <p>ホーム画面に追加すると、いつでもすぐに占えます✨</p>
-                        <ol>
-                            <li>下の共有ボタン［⬆］をタップ</li>
-                            <li>「ホーム画面に追加」を選択</li>
-                            <li>「追加」をタップ</li>
-                        </ol>
-                        <button onclick="this.parentElement.parentElement.remove()">後で</button>
-                    </div>
-                `;
-                document.body.appendChild(popup);
-            }
-            // Androidの場合
-            else if (/Android/.test(navigator.userAgent)) {
-                const popup = document.createElement('div');
-                popup.className = 'add-to-home-popup';
-                popup.innerHTML = `
-                    <div class="add-to-home-content">
-                        <h3>📱 アプリのように使えます！</h3>
-                        <p>ホーム画面に追加すると、いつでもすぐに占えます✨</p>
-                        <ol>
-                            <li>右上の［⋮］メニューをタップ</li>
-                            <li>「ホーム画面に追加」を選択</li>
-                        </ol>
-                        <button onclick="this.parentElement.parentElement.remove()">後で</button>
-                    </div>
-                `;
-                document.body.appendChild(popup);
-            }
-        }
 
-        // 3回目の訪問で表示
-        let visitCount = localStorage.getItem('visitCount') || 0;
-        visitCount++;
-        localStorage.setItem('visitCount', visitCount);
-        if (visitCount === 3) {
-            setTimeout(showAddToHomeScreen, 5000);
-        }
-        
-        // 離脱防止
-        window.addEventListener('beforeunload', (e) => {
-            if (userData.step > 1 && !userData.converted) {
-                e.preventDefault();
-                e.returnValue = '本当に離れますか？特別な診断結果が消えてしまいます...';
-            }
-        });
-        
-        // ページ読み込み時の処理
+        // ページ読み込み時
         window.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('userData');
             if (saved) {
                 userData = JSON.parse(saved);
-                // 前回の続きから開始
                 if (userData.step === 2) {
                     document.getElementById('step1').classList.remove('active');
                     showStep2(userData.name);
@@ -941,6 +1338,11 @@
                     showStep3();
                 }
             }
+            
+            // 初回通知
+            setTimeout(() => {
+                showNotification('🎉 歓迎', 'KichiCompassへようこそ！');
+            }, 2000);
         });
     </script>
 </body>
