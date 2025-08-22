@@ -1393,6 +1393,9 @@
             userData.conversionTime = new Date();
             localStorage.setItem('userData', JSON.stringify(userData));
             
+          // 最初の480円決済へ
+    window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
+}
             // ここにStripe決済処理を実装
             alert('決済画面へ移動します（Stripe実装箇所）');
         }
@@ -2194,8 +2197,34 @@ const PaymentPsychology = {
     },
 
     // 購入処理
-    processPurchase(level) {
-        const stage = this.stages[level];
+processPurchase(level) {
+    const stage = this.stages[level];
+    
+    // 各レベルの決済リンク
+    const paymentLinks = {
+        0: 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200',
+        1: 'https://buy.stripe.com/test_7sY4gydIl85A6FV4lEcV201',
+        2: 'https://buy.stripe.com/test_dRmcN49s5adIfcr19scV202',
+        3: 'https://buy.stripe.com/test_eVq00i1ZDbhMfcrg4mcV203',
+        4: 'https://buy.stripe.com/test_14AbJ0cEh3Pkd4jg4mcV204',
+        5: 'https://buy.stripe.com/test_6oUbJ0eMp3Pkggv3hAcV205',
+        6: 'https://buy.stripe.com/test_dRm28qaw90D82pFf0icV206'
+    };
+    
+    // 決済ページへ遷移
+    if (paymentLinks[level]) {
+        // 課金レベルを保存
+        this.currentLevel = Math.max(this.currentLevel, level + 1);
+        this.totalSpent += stage.price;
+        localStorage.setItem('paymentLevel', this.currentLevel);
+        localStorage.setItem('totalSpent', this.totalSpent);
+        
+        // Stripeの決済ページへ
+        window.location.href = paymentLinks[level];
+    } else {
+        alert('決済リンクが設定されていません');
+    }
+},
         
         // アニメーション演出
         this.showProcessingAnimation();
@@ -2480,6 +2509,9 @@ const PaymentPsychology = {
 
     // サブスクリプション処理
     processSubscription() {
+    // 月額プランへ遷移
+    window.location.href = 'https://buy.stripe.com/test_dRm28qaw90D82pFf0icV206';
+} {
         alert('サブスクリプション登録画面へ（Stripe実装）');
         // Stripe定期課金の実装
     }
