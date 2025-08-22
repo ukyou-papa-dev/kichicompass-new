@@ -1388,26 +1388,22 @@
         }
         
         // 決済処理
-        function processPayment() {
-            userData.converted = true;
-            userData.conversionTime = new Date();
-            localStorage.setItem('userData', JSON.stringify(userData));
-            
-          // 最初の480円決済へ
+       function processPayment() {
+    userData.converted = true;
+    userData.conversionTime = new Date();
+    localStorage.setItem('userData', JSON.stringify(userData));
+    
+    // 最初の480円決済へ
     window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
 }
-            // ここにStripe決済処理を実装
-            alert('決済画面へ移動します（Stripe実装箇所）');
-        }
         
-        // 離脱防止
-        window.addEventListener('beforeunload', (e) => {
-            if (userData.step > 1 && !userData.converted) {
-                e.preventDefault();
-                e.returnValue = '本当に離れますか？特別な診断結果が消えてしまいます...';
-            }
-        });
-        
+// 離脱防止
+window.addEventListener('beforeunload', (e) => {
+    if (userData.step > 1 && !userData.converted) {
+        e.preventDefault();
+        e.returnValue = '本当に離れますか？特別な診断結果が消えてしまいます...';
+    }
+});
         // ページ読み込み時の処理
         window.addEventListener('DOMContentLoaded', () => {
             const saved = localStorage.getItem('userData');
@@ -2511,9 +2507,7 @@ processPurchase(level) {
     processSubscription() {
     // 月額プランへ遷移
     window.location.href = 'https://buy.stripe.com/test_dRm28qaw90D82pFf0icV206';
-} {
-        alert('サブスクリプション登録画面へ（Stripe実装）');
-        // Stripe定期課金の実装
+} 
     }
 };
 
