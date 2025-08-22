@@ -2444,22 +2444,19 @@
             document.getElementById('pointSystemModal').style.display = 'none';
         }
 
-        // ポイント購入処理
-        function purchasePoints(points, price) {
-            // アナリティクス送信
-            gtag('event', 'purchase_points', {
-                'value': price,
-                'currency': 'JPY',
-                'points': points
-            });
-            
-            // 購入確認
-            if (confirm(`${points.toLocaleString()}ポイントを¥${price.toLocaleString()}で購入しますか？`)) {
-                // Stripe決済へ（実際の実装時は価格別のリンクを用意）
-                localStorage.setItem('pendingPoints', points.toString());
-                window.location.href = `https://buy.stripe.com/test_${getPriceId(price)}`;
-            }
-        }
+        // ポイント購入処理（Stripe統合版）
+function purchasePoints(points, price) {
+    if (confirm(`${points.toLocaleString()}ポイントを¥${price.toLocaleString()}で購入しますか？`)) {
+        let url = '';
+        if (points === 1000) url = 'https://buy.stripe.com/test_eVq28qfQt3Pkfcr6tMcV20a';
+        else if (points === 5000) url = 'https://buy.stripe.com/test_8x27sKfQtbhM6FV9FYcV20b';
+        else if (points === 10000) url = 'https://buy.stripe.com/test_cNi4gydIl5Xs9S7cSacV20c';
+        else if (points === 30000) url = 'https://buy.stripe.com/test_bJebJ05bP71wggvg4mcV20d';
+        
+        if (url) window.location.href = url;
+    }
+}
+
 
         // 価格IDマッピング（Stripeで作成後に更新）
         function getPriceId(price) {
@@ -2516,16 +2513,17 @@
             }, 1000);
         }
 
-        // VIP購読
-        function subscribeVIP() {
-            gtag('event', 'subscribe_vip', {
-                'value': 4980,
-                'currency': 'JPY'
-            });
-            
-            localStorage.setItem('vipMember', 'true');
-            window.location.href = 'https://buy.stripe.com/test_vip_monthly';
-        }
+        // VIP購読（Stripe統合版）
+function subscribeVIP() {
+    localStorage.setItem('vipMember', 'true');
+    window.location.href = 'https://buy.stripe.com/test_3cIbJ06fTfy2e8naK2cV209';
+}
+
+// 個人鑑定予約（Stripe統合版）
+function bookPersonalReading() {
+    window.location.href = 'https://buy.stripe.com/test_8x228qfQtclQ0hxaK2cV20e';
+}
+
 
         // ダウンセルオファー
         function showDownsellOffer() {
@@ -2638,32 +2636,17 @@
             monthly: 4980  // 月額
         };
 
-        // 決済処理の更新
-        function processOptimizedPayment(step) {
-            const price = optimizedPricing[`step${step}`];
-            
-            // 累計支出更新
-            userData.totalSpent = (userData.totalSpent || 0) + price;
-            localStorage.setItem('totalSpent', userData.totalSpent.toString());
-            
-            // アナリティクス
-            gtag('event', 'purchase', {
-                'value': price,
-                'currency': 'JPY',
-                'transaction_id': Date.now(),
-                'items': [{
-                    'item_name': `Step ${step} Fortune`,
-                    'price': price,
-                    'quantity': 1
-                }]
-            });
-            
-            // 次のオファーをスケジュール
-            scheduleNextOffer(userData.totalSpent);
-            
-            // Stripe決済へ
-            window.location.href = `https://buy.stripe.com/test_step${step}`;
-        }
+        // 決済処理（Stripe統合版）
+function processPayment() {
+    // 初回480円の決済
+    window.location.href = 'https://buy.stripe.com/test_aFa7sK5bP99E2pF8BUcV200';
+}
+
+function processUpsell() {
+    // 1,980円の詳細診断
+    window.location.href = 'https://buy.stripe.com/test_dRmcN49s5adIfcr19scV202';
+}
+
 
         // 次のオファースケジューリング
         function scheduleNextOffer(totalSpent) {
