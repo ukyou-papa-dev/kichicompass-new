@@ -2785,6 +2785,304 @@ function bookPersonalReading() {
                 setTimeout(() => showPointModal(), 15000);
             }
         }
+// =====================================
+// 🔥 基本機能の実装（これがないとボタンが動かない！）
+// =====================================
+
+// ステップ1処理
+function processStep1() {
+    const name = document.getElementById('userName').value.trim();
+    if (!name) {
+        alert('お名前を入力してください');
+        return;
+    }
+    
+    // データ保存
+    userData.name = name;
+    userData.step = 1;
+    
+    // Google Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'start_fortune', {
+            'event_category': 'engagement',
+            'event_label': 'step1_complete'
+        });
+    }
+    
+    // 占術選択画面を表示
+    document.getElementById('step1').classList.remove('active');
+    document.getElementById('fortuneSelection').classList.add('active');
+    document.getElementById('userName2').textContent = name;
+    
+    // スクロールをトップに
+    window.scrollTo(0, 0);
+}
+
+// 占術選択
+function selectFortune(type) {
+    userData.fortuneType = type;
+    
+    // ローディング表示
+    document.getElementById('fortuneSelection').classList.remove('active');
+    document.getElementById('loading').classList.add('active');
+    
+    // ローディングメッセージ
+    const messages = [
+        '宇宙からメッセージを受信中...',
+        'あなたの運命を解析中...',
+        '星々の配置を確認中...',
+        '運命の扉が開かれます...'
+    ];
+    
+    let messageIndex = 0;
+    const loadingInterval = setInterval(() => {
+        document.getElementById('loadingText').textContent = messages[messageIndex];
+        messageIndex = (messageIndex + 1) % messages.length;
+    }, 1000);
+    
+    // 3秒後にステップ2へ
+    setTimeout(() => {
+        clearInterval(loadingInterval);
+        showStep2();
+    }, 3000);
+}
+
+// ステップ2表示
+function showStep2() {
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('step2').classList.add('active');
+    
+    const name = userData.name;
+    document.getElementById('displayName').textContent = name;
+    
+    // プレビューメッセージ
+    const messages = {
+        astrology: `${name}様の星座が示す運命は非常に特別です。今、宇宙があなたに重要なメッセージを送っています。`,
+        tarot: `${name}様のために引いたカードが、衝撃的な未来を暗示しています。`,
+        numerology: `${name}様の数字が示す運命は、まもなく大きな転機を迎えることを示しています。`,
+        animal: `${name}様の動物タイプが、近いうちに訪れる幸運を予言しています。`,
+        shichu: `${name}様の四柱推命が、人生最大のチャンスの到来を告げています。`,
+        all: `${name}様の全ての占術結果が一致して、驚くべき運命を示しています。`
+    };
+    
+    document.getElementById('previewMessage').textContent = 
+        messages[userData.fortuneType] || messages.all;
+    
+    document.getElementById('lovePreview').textContent = 
+        `${name}様の恋愛運は今、最高潮に達しています。しかし...`;
+    
+    // スクロールをトップに
+    window.scrollTo(0, 0);
+}
+
+// ステップ2処理
+function processStep2() {
+    const birthDate = document.getElementById('birthDate').value;
+    if (!birthDate) {
+        alert('生年月日を入力してください');
+        return;
+    }
+    
+    userData.birthDate = birthDate;
+    userData.step = 3;
+    
+    // Google Analytics
+    if (typeof gtag !== 'undefined') {
+        gtag('event', 'complete_info', {
+            'event_category': 'engagement',
+            'event_label': 'step2_complete'
+        });
+    }
+    
+    // ローディング表示
+    document.getElementById('step2').classList.remove('active');
+    document.getElementById('loading').classList.add('active');
+    
+    // 2秒後に結果表示
+    setTimeout(() => {
+        showStep3();
+    }, 2000);
+}
+
+// ステップ3表示
+function showStep3() {
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('step3').classList.add('active');
+    
+    const name = userData.name;
+    const birthDate = userData.birthDate;
+    
+    document.getElementById('finalName').textContent = name;
+    
+    // 占術結果生成
+    if (userData.fortuneType && userData.fortuneType !== 'all') {
+        const fortune = FortuneDatabase[userData.fortuneType];
+        if (fortune) {
+            const result = fortune.generateResult(name, birthDate);
+            document.getElementById('fortuneResultArea').innerHTML = result;
+        }
+    } else {
+        // 総合鑑定の場合
+        let allResults = '<div class="comprehensive-result">';
+        ['astrology', 'tarot', 'numerology'].forEach(type => {
+            const fortune = FortuneDatabase[type];
+            if (fortune) {
+                allResults += fortune.generateResult(name, birthDate);
+            }
+        });
+        allResults += '</div>';
+        document.getElementById('fortuneResultArea').innerHTML = allResults;
+    }
+    
+    // 重要メッセージ
+    const criticalMessages = [
+        `${name}様、実は今月があなたの人生の大きな転換点となります。`,
+        `${name}様に重要な警告があります。このメッセージを見逃さないでください。`,
+        `${name}様の運命に、まもなく大きな変化が訪れます。準備はできていますか？`
+    ];
+    
+    document.getElementById('criticalMessage').textContent = 
+        criticalMessages[Math.floor(Math.random() * criticalMessages.length)];
+    
+    // 恋愛運
+    document.getElementById('loveFortune').innerHTML = `
+        ${name}様の恋愛運は今、人生最高の状態にあります。
+        <br><br>
+        実は、あなたの周りにいる「ある人物」が、
+        あなたに対して特別な感情を抱いています。
+        <br><br>
+        その人のイニシャルは...
+        <strong style="color: #ffd700; font-size: 20px;">（続きは有料版で）</strong>
+    `;
+    
+    // 金運
+    document.getElementById('moneyFortune').innerHTML = `
+        ${name}様の金運に大きな転機が訪れています。
+        <br><br>
+        特に今月の<strong>15日前後</strong>に、
+        思いがけない臨時収入の可能性が...
+        <br><br>
+        <strong style="color: #ffd700;">詳細な日付と金額は有料版で明らかになります。</strong>
+    `;
+    
+    // スクロールをトップに
+    window.scrollTo(0, 0);
+    
+    // アップセルトリガー
+    triggerUpsell();
+}
+
+// 特別オファー表示
+function showSpecialOffer() {
+    document.getElementById('specialOfferModal').classList.add('show');
+    startOfferCountdown();
+}
+
+// 特別オファー閉じる
+function closeSpecialOffer() {
+    document.getElementById('specialOfferModal').classList.remove('show');
+}
+
+// オファーカウントダウン
+function startOfferCountdown() {
+    let timeLeft = 300; // 5分
+    const countdownEl = document.getElementById('offerCountdown');
+    
+    const timer = setInterval(() => {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        countdownEl.textContent = `00:0${minutes}:${seconds.toString().padStart(2, '0')}`;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timer);
+            closeSpecialOffer();
+        }
+        timeLeft--;
+    }, 1000);
+}
+
+// 通知表示
+function showNotification(title, message) {
+    const notification = document.createElement('div');
+    notification.className = 'notification-popup';
+    notification.innerHTML = `
+        <div class="notification-header">
+            <div class="notification-icon">!</div>
+            <div class="notification-title">${title}</div>
+        </div>
+        <div class="notification-message">${message}</div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 100);
+    
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 5000);
+}
+
+// カウントダウンタイマー
+function startCountdownTimer() {
+    let hours = 23;
+    let minutes = 59;
+    let seconds = 59;
+    
+    setInterval(() => {
+        seconds--;
+        if (seconds < 0) {
+            seconds = 59;
+            minutes--;
+            if (minutes < 0) {
+                minutes = 59;
+                hours--;
+                if (hours < 0) {
+                    hours = 23;
+                }
+            }
+        }
+        
+        document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+        document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+    }, 1000);
+}
+
+// ユーザーカウンターの更新
+function updateUserCounter() {
+    setInterval(() => {
+        const currentCount = parseInt(document.getElementById('activeUsers').textContent);
+        const change = Math.floor(Math.random() * 21) - 10; // -10 to +10
+        const newCount = Math.max(2500, Math.min(3500, currentCount + change));
+        document.getElementById('activeUsers').textContent = newCount.toLocaleString();
+    }, 5000);
+}
+
+// ページ読み込み時の初期化
+document.addEventListener('DOMContentLoaded', function() {
+    // カウントダウン開始
+    startCountdownTimer();
+    
+    // ユーザーカウンター更新
+    updateUserCounter();
+    
+    // ポイントシステム初期化
+    initPointSystem();
+    
+    // 訪問回数カウント
+    const visitCount = parseInt(localStorage.getItem('visitCount') || '0') + 1;
+    localStorage.setItem('visitCount', visitCount.toString());
+    
+    // モバイル対応
+    if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        document.body.classList.add('mobile');
+    }
+});
+
 
         // アップセル自動化
         function triggerUpsell() {
