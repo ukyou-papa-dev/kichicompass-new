@@ -1529,30 +1529,7 @@
             }
         }
 
-        /* レスポンシブ */
-        @media (max-width: 768px) {
-            .point-packages {
-                grid-template-columns: 1fr;
-            }
-            
-            .point-package.vip {
-                grid-column: span 1;
-            }
-            
-            .personal-features {
-                grid-template-columns: 1fr;
-            }
-            
-            .vip-comparison {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .title-text {
-                font-size: 24px;
-            }
-            /* タブレット・大画面スマホ用 */
+        /* タブレット・大画面スマホ用 */
 @media (max-width: 768px) {
     /* 基本的なモバイル対応 */
     * {
@@ -1583,18 +1560,44 @@
         right: 10px !important;
         font-size: 14px !important;
     }
+    
+    .point-packages {
+        grid-template-columns: 1fr;
+    }
+    
+    .point-package.vip {
+        grid-column: span 1;
+    }
+    
+    .personal-features {
+        grid-template-columns: 1fr;
+    }
+    
+    .vip-comparison {
+        grid-template-columns: 1fr;
+    }
 }
 
-            .container {
-                padding: 15px;
-            }
-            
-            .notification-popup {
-                left: 10px;
-                right: 10px;
-                max-width: none;
-            }
-  /* モバイル用スクロール修正 */
+        @media (max-width: 480px) {
+    /* 基本スタイル */
+    .title-text {
+        font-size: 24px;
+    }
+    
+    .container {
+        padding: 15px;
+        padding-bottom: 100px !important;
+        position: relative !important;
+        z-index: 1 !important;
+    }
+    
+    .notification-popup {
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+    
+    /* モバイル用スクロール修正 */
     body {
         position: relative !important;
         height: auto !important;
@@ -1714,19 +1717,22 @@
         position: relative !important;
         z-index: 10 !important;
     }
-    
-    /* iOS Safari用の追加修正 */
-    @supports (-webkit-touch-callout: none) {
-        body {
-            -webkit-user-select: none;
-            -webkit-touch-callout: none;
-        }
-        
-        input, textarea {
-            -webkit-user-select: text !important;
-            -webkit-touch-callout: default !important;
-        }
+}
+
+/* iOS Safari用の追加修正 */
+@supports (-webkit-touch-callout: none) {
+    body {
+        -webkit-user-select: none;
+        -webkit-touch-callout: none;
     }
+    
+    input, textarea {
+        -webkit-user-select: text !important;
+        -webkit-touch-callout: default !important;
+    }
+}
+
+        
             .tarot-spread {
                 grid-template-columns: 1fr;
             }
